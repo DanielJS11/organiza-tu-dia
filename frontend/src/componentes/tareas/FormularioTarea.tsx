@@ -7,17 +7,17 @@ import CampoDuracion from './CampoDuracion'
 
 type Props = {
   tarea?: Tarea // si viene, el formulario edita; si no, crea
+  fechaInicial?: string // fecha sugerida al crear desde el calendario (formato "2026-10-24T23:59")
   onGuardar: (datos: DatosTarea) => Promise<void>
   onCancelar: () => void
 }
 
 const prioridades: Prioridad[] = ['ALTA', 'MEDIA', 'BAJA']
-
-export default function FormularioTarea({ tarea, onGuardar, onCancelar }: Props) {
+export default function FormularioTarea({ tarea, fechaInicial, onGuardar, onCancelar }: Props) {
   const [titulo, setTitulo] = useState(tarea?.titulo ?? '')
   const [descripcion, setDescripcion] = useState(tarea?.descripcion ?? '')
     const fechaOriginal = tarea?.fechaEntrega ? aFechaLocal(tarea.fechaEntrega) : ''
-  const [fechaEntrega, setFechaEntrega] = useState(fechaOriginal)
+    const [fechaEntrega, setFechaEntrega] = useState(fechaOriginal || fechaInicial || '')
   const [fechaMinima] = useState(() => aFechaLocal(new Date().toISOString())) // momento en que se abrió el formulario
   const [prioridad, setPrioridad] = useState<Prioridad>(tarea?.prioridad ?? 'MEDIA')
   const [duracion, setDuracion] = useState(tarea?.duracionEstimadaMin ?? 60)

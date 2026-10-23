@@ -1,1 +1,12 @@
 @import "tailwindcss";
+
+/* Colores del calendario para que combine con el resto de la página */
+.calendario {
+  --fc-classic-button: #0d9488;
+  --fc-classic-button-border: #0d9488;
+  --fc-classic-button-strong: #115e59;
+  --fc-classic-button-strong-border: #115e59;
+  --fc-classic-button-outline: #0d948866;
+  --fc-classic-today: #ccfbf180;
+  --fc-classic-border: #e2e8f0;
+}

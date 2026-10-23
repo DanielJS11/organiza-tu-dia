@@ -1,14 +1,22 @@
 import { useState } from 'react'
 import type { Prioridad, Tarea } from '../tipos'
 import { useTareas } from '../hooks/useTareas'
-import { formatearDuracion } from '../utilidades/formato'
+import { aFechaLocal, formatearDuracion } from '../utilidades/formato'
 import { claseBotonPrincipal, claseCampoBase } from '../utilidades/estilos'
 import Modal from '../componentes/Modal'
 import FormularioTarea from '../componentes/tareas/FormularioTarea'
 import TarjetaTarea from '../componentes/tareas/TarjetaTarea'
 import DialogoCompletar from '../componentes/tareas/DialogoCompletar'
+import CalendarioTareas from '../componentes/tareas/CalendarioTareas'
+import Pestanas from '../componentes/Pestanas'
 
+type Vista = 'lista' | 'calendario'
 type FiltroEstado = 'pendientes' | 'completadas' | 'todas'
+
+const vistas: { valor: Vista; nombre: string }[] = [
+  { valor: 'lista', nombre: 'Lista' },
+  { valor: 'calendario', nombre: 'Calendario' },
+]
 
 const filtrosEstado: { valor: FiltroEstado; nombre: string }[] = [
   { valor: 'pendientes', nombre: 'Pendientes' },
@@ -18,11 +26,13 @@ const filtrosEstado: { valor: FiltroEstado; nombre: string }[] = [
 
 export default function Organiza() {
   const { tareas, cargando, error, crear, editar, eliminar } = useTareas()
+  const [vista, setVista] = useState<Vista>('lista')
   const [filtroEstado, setFiltroEstado] = useState<FiltroEstado>('pendientes')
   const [filtroPrioridad, setFiltroPrioridad] = useState<Prioridad | 'TODAS'>('TODAS')
-  const [creando, setCreando] = useState(false)
+  const [creando, setCreando] = useState<{ fechaInicial?: string } | null>(null)
   const [editando, setEditando] = useState<Tarea | null>(null)
   const [completando, setCompletando] = useState<Tarea | null>(null)
+  const [detalle, setDetalle] = useState<Tarea | null>(null)
 
   const pendientes = tareas.filter((t) => t.estado !== 'COMPLETADA')
   const minutosPendientes = pendientes.reduce((total, t) => total + t.duracionEstimadaMin, 0)
@@ -37,8 +47,31 @@ export default function Organiza() {
   function confirmarEliminar(tarea: Tarea) {
     if (window.confirm(`¿Eliminar "${tarea.titulo}"? Esta acción no se puede deshacer.`)) {
       eliminar(tarea.id)
+      setDetalle(null)
     }
   }
+
+  // Al hacer clic en un día del calendario se abre "Nueva tarea" con esa fecha (nunca en el pasado)
+  function crearDesdeCalendario(fecha: Date, todoElDia: boolean) {
+    const ahora = new Date()
+    const sugerida = new Date(fecha)
+    if (todoElDia) sugerida.setHours(23, 59, 0, 0)
+    if (sugerida < ahora) return
+    setCreando({ fechaInicial: aFechaLocal(sugerida.toISOString()) })
+  }
+
+  // Botones de cada tarea; desde el detalle del calendario primero se cierra la ventana
+  const accionesTarea = (t: Tarea) => ({
+    onCompletar: () => {
+      setDetalle(null)
+      setCompletando(t)
+    },
+    onEditar: () => {
+      setDetalle(null)
+      setEditando(t)
+    },
+    onEliminar: () => confirmarEliminar(t),
+  })
 
   return (
     <div>
@@ -51,42 +84,42 @@ export default function Organiza() {
               : `${pendientes.length} ${pendientes.length === 1 ? 'tarea pendiente' : 'tareas pendientes'} · ${formatearDuracion(minutosPendientes)} estimadas`}
           </p>
         </div>
-        <button onClick={() => setCreando(true)} className={claseBotonPrincipal}>
+        <button onClick={() => setCreando({})} className={claseBotonPrincipal}>
           + Nueva tarea
         </button>
       </div>
 
       <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
-        <div className="flex gap-1 rounded-lg bg-slate-100 p-1">
-          {filtrosEstado.map((f) => (
-            <button
-              key={f.valor}
-              onClick={() => setFiltroEstado(f.valor)}
-              className={`rounded-md px-3 py-1.5 text-sm ${
-                filtroEstado === f.valor ? 'bg-white font-medium text-slate-800 shadow-sm' : 'text-slate-600'
-              }`}
+        <Pestanas opciones={vistas} valor={vista} onCambiar={setVista} />
+        {vista === 'lista' && (
+          <div className="flex flex-wrap gap-3">
+            <Pestanas opciones={filtrosEstado} valor={filtroEstado} onCambiar={setFiltroEstado} />
+            <select
+              value={filtroPrioridad}
+              onChange={(e) => setFiltroPrioridad(e.target.value as Prioridad | 'TODAS')}
+              className={claseCampoBase}
+              aria-label="Filtrar por prioridad"
             >
-              {f.nombre}
-            </button>
-          ))}
-        </div>
-        <select
-          value={filtroPrioridad}
-          onChange={(e) => setFiltroPrioridad(e.target.value as Prioridad | 'TODAS')}
-          className={claseCampoBase}
-          aria-label="Filtrar por prioridad"
-        >
-          <option value="TODAS">Todas las prioridades</option>
-          <option value="ALTA">Prioridad alta</option>
-          <option value="MEDIA">Prioridad media</option>
-          <option value="BAJA">Prioridad baja</option>
-        </select>
+              <option value="TODAS">Todas las prioridades</option>
+              <option value="ALTA">Prioridad alta</option>
+              <option value="MEDIA">Prioridad media</option>
+              <option value="BAJA">Prioridad baja</option>
+            </select>
+          </div>
+        )}
       </div>
 
       {error && <p className="mt-6 text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2">{error}</p>}
 
       {cargando ? (
         <p className="mt-8 text-center text-slate-500">Cargando tareas…</p>
+      ) : vista === 'calendario' ? (
+        <div className="mt-6">
+          <CalendarioTareas tareas={tareas} onSeleccionarTarea={setDetalle} onSeleccionarFecha={crearDesdeCalendario} />
+          <p className="mt-3 text-sm text-slate-500">
+            Haz clic en un día para crear una tarea con esa fecha. Las tareas sin fecha de entrega solo aparecen en la lista.
+          </p>
+        </div>
       ) : visibles.length === 0 ? (
         <p className="mt-8 rounded-xl border border-dashed border-slate-300 p-8 text-center text-slate-500">
           {tareas.length === 0 ? 'Aún no tienes tareas. Crea la primera con "+ Nueva tarea".' : 'No hay tareas con estos filtros.'}
@@ -94,25 +127,28 @@ export default function Organiza() {
       ) : (
         <ul className="mt-6 space-y-3">
           {visibles.map((t) => (
-            <TarjetaTarea
-              key={t.id}
-              tarea={t}
-              onCompletar={() => setCompletando(t)}
-              onEditar={() => setEditando(t)}
-              onEliminar={() => confirmarEliminar(t)}
-            />
+            <TarjetaTarea key={t.id} tarea={t} {...accionesTarea(t)} />
           ))}
         </ul>
       )}
 
+      {detalle && (
+        <Modal titulo="Detalle de la tarea" onCerrar={() => setDetalle(null)}>
+          <ul className="rounded-xl border border-slate-200">
+            <TarjetaTarea tarea={detalle} {...accionesTarea(detalle)} />
+          </ul>
+        </Modal>
+      )}
+
       {creando && (
-        <Modal titulo="Nueva tarea" onCerrar={() => setCreando(false)}>
+        <Modal titulo="Nueva tarea" onCerrar={() => setCreando(null)}>
           <FormularioTarea
+            fechaInicial={creando.fechaInicial}
             onGuardar={async (datos) => {
               await crear(datos)
-              setCreando(false)
+              setCreando(null)
             }}
-            onCancelar={() => setCreando(false)}
+            onCancelar={() => setCreando(null)}
           />
         </Modal>
       )}
