@@ -4,6 +4,7 @@ import cors from 'cors'
 import cookieParser from 'cookie-parser'
 import { prisma } from './db.js'
 import rutasAuth from './rutas/auth.js'
+import rutasTareas from './rutas/tareas.js'
 
 if (!process.env.JWT_SECRET) {
   throw new Error('Falta JWT_SECRET en el archivo .env')
@@ -21,6 +22,7 @@ app.get('/api/salud', (_req, res) => {
 })
 
 app.use('/api/auth', rutasAuth)
+app.use('/api/tareas', rutasTareas)
 
 app.get('/api/plantillas', async (_req, res) => {
   const plantillas = await prisma.plantilla.findMany({

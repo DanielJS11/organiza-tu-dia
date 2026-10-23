@@ -4,6 +4,7 @@ import Plantilla from './componentes/Plantilla'
 import Ingresar from './paginas/Ingresar'
 import Registro from './paginas/Registro'
 import Inicio from './paginas/Inicio'
+import Organiza from './paginas/Organiza'
 import EnConstruccion from './paginas/EnConstruccion'
 
 export default function App() {
@@ -16,7 +17,7 @@ export default function App() {
         <Route element={<Plantilla />}>
           <Route path="/" element={<Inicio />} />
           <Route path="/elige" element={<EnConstruccion titulo="Elige" />} />
-          <Route path="/organiza" element={<EnConstruccion titulo="Organiza" />} />
+          <Route path="/organiza" element={<Organiza />} />
           <Route path="/reflexiona" element={<EnConstruccion titulo="Reflexiona" />} />
         </Route>
       </Route>
