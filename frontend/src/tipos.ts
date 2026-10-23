@@ -35,7 +35,6 @@ export type DatosTarea = {
   tiempoRealMin?: number | null
 }
 
-
 export type TipoBloque = 'ESTUDIO' | 'TRABAJO' | 'ENFOQUE' | 'DESCANSO' | 'PERSONAL'
 
 export type BloquePlantilla = {
@@ -55,6 +54,9 @@ export type Plantilla = {
   bloques: BloquePlantilla[]
 }
 
+// Lo que el día necesita saber de la tarea asignada a un bloque
+export type TareaResumen = Pick<Tarea, 'id' | 'titulo' | 'prioridad' | 'estado' | 'duracionEstimadaMin'>
+
 export type Bloque = {
   id: string
   tipo: TipoBloque
@@ -62,7 +64,11 @@ export type Bloque = {
   horaInicio: string
   horaFin: string
   tareaId: string | null
+  tarea: TareaResumen | null
 }
+
+// Datos que se envían al agregar o editar un bloque
+export type DatosBloque = Pick<Bloque, 'tipo' | 'titulo' | 'horaInicio' | 'horaFin' | 'tareaId'>
 
 export type DiaPlanificado = {
   id: string
@@ -72,4 +78,4 @@ export type DiaPlanificado = {
 }
 
 // Forma común para dibujar bloques, vengan de una plantilla o de un día ya planificado
-export type BloqueVista = Pick<Bloque, 'tipo' | 'titulo' | 'horaInicio' | 'horaFin'>
+export type BloqueVista = Pick<Bloque, 'tipo' | 'titulo' | 'horaInicio' | 'horaFin'> & { tarea?: TareaResumen | null }

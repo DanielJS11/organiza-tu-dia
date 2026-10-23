@@ -1,15 +1,17 @@
 import { useState } from 'react'
-import type { Plantilla } from '../tipos'
+import type { Bloque, DatosBloque, Plantilla } from '../tipos'
 import { usePlantillas } from '../hooks/usePlantillas'
 import { useDia } from '../hooks/useDia'
-import { fechaHoy, formatearDia, sumarDias } from '../utilidades/tiempo'
-import { bloquesDePlantilla } from '../utilidades/tiposBloque'
+import { useTareas } from '../hooks/useTareas'
+import { aHora, aMinutos, fechaHoy, formatearDia, sumarDias } from '../utilidades/tiempo'
+import { bloquesDePlantilla, duracionBloque } from '../utilidades/tiposBloque'
 import { claseBotonPrincipal, claseBotonSecundario } from '../utilidades/estilos'
 import Modal from '../componentes/Modal'
 import SelectorFecha from '../componentes/plan/SelectorFecha'
 import LineaDeTiempo from '../componentes/plan/LineaDeTiempo'
 import ResumenBloques from '../componentes/plan/ResumenBloques'
 import TarjetaPlantilla from '../componentes/plan/TarjetaPlantilla'
+import FormularioBloque from '../componentes/plan/FormularioBloque'
 
 // "hoy", "mañana" o "el viernes, 30 de octubre"
 function nombrarDia(fecha: string) {
@@ -18,16 +20,38 @@ function nombrarDia(fecha: string) {
   return `el ${formatearDia(fecha)}`
 }
 
+// Minutos que cada tarea tiene asignados en el día, sin contar el bloque que se está editando
+function minutosPorTarea(bloques: Bloque[], excluirId?: string) {
+  const minutos: Record<string, number> = {}
+  for (const b of bloques) {
+    if (b.tareaId && b.id !== excluirId) minutos[b.tareaId] = (minutos[b.tareaId] ?? 0) + duracionBloque(b)
+  }
+  return minutos
+}
+
+// Un bloque nuevo empieza donde termina el último y dura una hora (sin pasar de las 11:59 p. m.)
+function bloqueNuevo(bloques: Bloque[]): DatosBloque {
+  const inicio = Math.min(bloques.length ? aMinutos(bloques[bloques.length - 1].horaFin) : 8 * 60, 23 * 60)
+  return { tipo: 'PERSONAL', titulo: '', horaInicio: aHora(inicio), horaFin: aHora(Math.min(inicio + 60, 23 * 60 + 59)), tareaId: null }
+}
+
 export default function Elige() {
   const [fecha, setFecha] = useState(fechaHoy())
   const { plantillas, cargando: cargandoPlantillas, error: errorPlantillas } = usePlantillas()
-  const { dia, cargando: cargandoDia, error: errorDia, aplicarPlantilla, quitarPlan } = useDia(fecha)
+  const { dia, cargando: cargandoDia, error: errorDia, aplicarPlantilla, quitarPlan, agregarBloque, editarBloque, eliminarBloque } =
+    useDia(fecha)
+  const { tareas } = useTareas()
   const [cambiando, setCambiando] = useState(false)
   const [vistaPrevia, setVistaPrevia] = useState<Plantilla | null>(null)
   const [aplicando, setAplicando] = useState(false)
   const [error, setError] = useState('')
+  // Bloque que se está editando: { bloque: null } significa que se está agregando uno nuevo
+  const [editandoBloque, setEditandoBloque] = useState<{ bloque: Bloque | null } | null>(null)
 
   const mostrarPlantillas = !dia || cambiando
+  const pendientes = tareas.filter((t) => t.estado !== 'COMPLETADA')
+  const idsUbicadas = new Set(dia?.bloques.map((b) => b.tareaId).filter(Boolean))
+  const sinUbicar = pendientes.filter((t) => !idsUbicadas.has(t.id))
 
   function cambiarFecha(nueva: string) {
     setFecha(nueva)
@@ -45,6 +69,12 @@ export default function Elige() {
       setError((err as Error).message)
     } finally {
       setAplicando(false)
+    }
+  }
+
+  async function confirmarEliminarBloque(bloque: Bloque) {
+    if (window.confirm(`¿Eliminar el bloque "${bloque.titulo}"?`)) {
+      await eliminarBloque(bloque.id)
     }
   }
 
@@ -91,7 +121,37 @@ export default function Elige() {
                 <ResumenBloques bloques={dia.bloques} />
               </div>
               <div className="mt-5">
-                <LineaDeTiempo bloques={dia.bloques} />
+                <LineaDeTiempo
+                  bloques={dia.bloques}
+                  acciones={(i) => (
+                    <span className="flex gap-1">
+                      <button
+                        onClick={() => setEditandoBloque({ bloque: dia.bloques[i] })}
+                        className="rounded-lg px-2 py-1 text-slate-500 hover:bg-white hover:text-slate-800"
+                      >
+                        Editar
+                      </button>
+                      <button
+                        onClick={() => confirmarEliminarBloque(dia.bloques[i])}
+                        className="rounded-lg px-2 py-1 text-slate-500 hover:bg-white hover:text-red-600"
+                      >
+                        Eliminar
+                      </button>
+                    </span>
+                  )}
+                />
+              </div>
+              <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+                <button onClick={() => setEditandoBloque({ bloque: null })} className={claseBotonSecundario}>
+                  + Agregar bloque
+                </button>
+                {pendientes.length > 0 && (
+                  <p className="text-sm text-slate-500">
+                    {sinUbicar.length === 0
+                      ? 'Todas tus tareas pendientes tienen un bloque.'
+                      : `${sinUbicar.length} de ${pendientes.length} tareas pendientes aún sin bloque. Usa "Editar" en un bloque para asignarlas.`}
+                  </p>
+                )}
               </div>
             </section>
           )}
@@ -116,6 +176,24 @@ export default function Elige() {
             </section>
           )}
         </>
+      )}
+
+      {editandoBloque && dia && (
+        <Modal titulo={editandoBloque.bloque ? 'Editar bloque' : 'Agregar bloque'} onCerrar={() => setEditandoBloque(null)}>
+          <FormularioBloque
+            esNuevo={!editandoBloque.bloque}
+                        inicial={editandoBloque.bloque ?? bloqueNuevo(dia.bloques)}
+            minutosEnOtrosBloques={minutosPorTarea(dia.bloques, editandoBloque.bloque?.id)}
+            // Se ofrecen las tareas pendientes; si el bloque ya tenía una completada, también se muestra
+            tareas={tareas.filter((t) => t.estado !== 'COMPLETADA' || t.id === editandoBloque.bloque?.tareaId)}
+            onGuardar={async (datos) => {
+              if (editandoBloque.bloque) await editarBloque(editandoBloque.bloque.id, datos)
+              else await agregarBloque(datos)
+              setEditandoBloque(null)
+            }}
+            onCancelar={() => setEditandoBloque(null)}
+          />
+        </Modal>
       )}
 
       {vistaPrevia && (

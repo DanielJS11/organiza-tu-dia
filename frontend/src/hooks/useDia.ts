@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { api } from '../api'
-import type { DiaPlanificado } from '../tipos'
+import type { DatosBloque, DiaPlanificado } from '../tipos'
 
-// Carga el plan de una fecha y permite aplicarle una plantilla o quitarlo
+// Carga el plan de una fecha y permite aplicarle una plantilla, ajustar sus bloques o quitarlo
 export function useDia(fecha: string) {
   const [dia, setDia] = useState<DiaPlanificado | null>(null)
   const [fechaCargada, setFechaCargada] = useState<string | null>(null)
@@ -32,5 +32,26 @@ export function useDia(fecha: string) {
     setDia(null)
   }
 
-  return { dia, cargando: fechaCargada !== fecha, error, aplicarPlantilla, quitarPlan }
+  async function agregarBloque(datos: DatosBloque) {
+    setDia(await api<DiaPlanificado>(`/dias/${fecha}/bloques`, { method: 'POST', body: JSON.stringify(datos) }))
+  }
+
+  async function editarBloque(id: string, datos: DatosBloque) {
+    setDia(await api<DiaPlanificado>(`/dias/${fecha}/bloques/${id}`, { method: 'PATCH', body: JSON.stringify(datos) }))
+  }
+
+  async function eliminarBloque(id: string) {
+    setDia(await api<DiaPlanificado>(`/dias/${fecha}/bloques/${id}`, { method: 'DELETE' }))
+  }
+
+  return {
+    dia,
+    cargando: fechaCargada !== fecha,
+    error,
+    aplicarPlantilla,
+    quitarPlan,
+    agregarBloque,
+    editarBloque,
+    eliminarBloque,
+  }
 }
