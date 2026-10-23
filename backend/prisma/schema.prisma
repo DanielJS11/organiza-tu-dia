@@ -1,0 +1,184 @@
+// Modelo de datos de la plataforma "Organiza tu día"
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Listas de valores fijos ───────────────────────────────
+
+enum Prioridad {
+  ALTA
+  MEDIA
+  BAJA
+}
+
+enum EstadoTarea {
+  PENDIENTE
+  EN_PROGRESO
+  COMPLETADA
+}
+
+enum TipoBloque {
+  ESTUDIO
+  TRABAJO
+  ENFOQUE
+  DESCANSO
+  PERSONAL
+}
+
+enum EstadoSugerencia {
+  PENDIENTE
+  ACEPTADA
+  EDITADA
+  DESCARTADA
+}
+
+// ─── Cuenta ────────────────────────────────────────────────
+
+model Usuario {
+  id             String   @id @default(uuid())
+  nombre         String
+  correo         String   @unique
+  hashContrasena String
+  zonaHoraria    String   @default("America/Bogota")
+  horaInicio     String   @default("08:00")
+  horaFin        String   @default("22:00")
+  iaActivada     Boolean  @default(true)
+  creadoEn       DateTime @default(now())
+
+  tareas      Tarea[]
+  dias        DiaPlanificado[]
+  entradas    EntradaDiario[]
+  etiquetas   Etiqueta[]
+  sugerencias Sugerencia[]
+
+  @@map("usuarios")
+}
+
+// ─── Elige: plantillas de día ──────────────────────────────
+
+model Plantilla {
+  id          Int    @id @default(autoincrement())
+  clave       String @unique
+  nombre      String
+  descripcion String
+
+  bloques BloquePlantilla[]
+  dias    DiaPlanificado[]
+
+  @@map("plantillas")
+}
+
+model BloquePlantilla {
+  id          Int        @id @default(autoincrement())
+  plantillaId Int
+  tipo        TipoBloque
+  titulo      String
+  horaInicio  String
+  duracionMin Int
+  orden       Int
+
+  plantilla Plantilla @relation(fields: [plantillaId], references: [id], onDelete: Cascade)
+
+  @@map("bloques_plantilla")
+}
+
+// ─── Organiza: días, bloques y tareas ──────────────────────
+
+model DiaPlanificado {
+  id          String   @id @default(uuid())
+  usuarioId   String
+  fecha       DateTime @db.Date
+  plantillaId Int?
+
+  usuario   Usuario    @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  plantilla Plantilla? @relation(fields: [plantillaId], references: [id], onDelete: SetNull)
+  bloques   Bloque[]
+
+  @@unique([usuarioId, fecha])
+  @@map("dias_planificados")
+}
+
+model Bloque {
+  id         String     @id @default(uuid())
+  diaId      String
+  tipo       TipoBloque
+  titulo     String
+  horaInicio String
+  horaFin    String
+  tareaId    String?
+
+  dia   DiaPlanificado @relation(fields: [diaId], references: [id], onDelete: Cascade)
+  tarea Tarea?         @relation(fields: [tareaId], references: [id], onDelete: SetNull)
+
+  @@map("bloques")
+}
+
+model Tarea {
+  id                  String      @id @default(uuid())
+  usuarioId           String
+  titulo              String
+  descripcion         String?
+  fechaEntrega        DateTime?
+  prioridad           Prioridad   @default(MEDIA)
+  duracionEstimadaMin Int
+  tiempoRealMin       Int?
+  estado              EstadoTarea @default(PENDIENTE)
+  creadaEn            DateTime    @default(now())
+  actualizadaEn       DateTime    @updatedAt
+
+  usuario Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  bloques Bloque[]
+
+  @@index([usuarioId, fechaEntrega])
+  @@map("tareas")
+}
+
+// ─── Reflexiona: diario ────────────────────────────────────
+
+model EntradaDiario {
+  id            String   @id @default(uuid())
+  usuarioId     String
+  fecha         DateTime @db.Date
+  texto         String   @db.Text
+  creadaEn      DateTime @default(now())
+  actualizadaEn DateTime @updatedAt
+
+  usuario   Usuario    @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  etiquetas Etiqueta[]
+
+  @@index([usuarioId, fecha])
+  @@map("entradas_diario")
+}
+
+model Etiqueta {
+  id        String @id @default(uuid())
+  usuarioId String
+  nombre    String
+
+  usuario  Usuario         @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  entradas EntradaDiario[]
+
+  @@unique([usuarioId, nombre])
+  @@map("etiquetas")
+}
+
+// ─── IA: registro de sugerencias ───────────────────────────
+
+model Sugerencia {
+  id        String           @id @default(uuid())
+  usuarioId String
+  fecha     DateTime         @db.Date
+  contenido String           @db.Text
+  estado    EstadoSugerencia @default(PENDIENTE)
+  creadaEn  DateTime         @default(now())
+
+  usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@map("sugerencias")
+}
