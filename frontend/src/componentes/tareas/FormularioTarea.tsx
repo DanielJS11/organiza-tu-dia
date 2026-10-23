@@ -18,7 +18,9 @@ export default function FormularioTarea({ tarea, fechaInicial, onGuardar, onCanc
   const [descripcion, setDescripcion] = useState(tarea?.descripcion ?? '')
     const fechaOriginal = tarea?.fechaEntrega ? aFechaLocal(tarea.fechaEntrega) : ''
     const [fechaEntrega, setFechaEntrega] = useState(fechaOriginal || fechaInicial || '')
-  const [fechaMinima] = useState(() => aFechaLocal(new Date().toISOString())) // momento en que se abrió el formulario
+    const [fechaMinima] = useState(() => aFechaLocal(new Date().toISOString())) // momento en que se abrió el formulario
+  // Una tarea ya vencida puede editarse sin cambiar su fecha; en cualquier otro caso el calendario bloquea los días pasados
+  const vencidaSinCambios = fechaOriginal !== '' && fechaOriginal < fechaMinima && fechaEntrega === fechaOriginal
   const [prioridad, setPrioridad] = useState<Prioridad>(tarea?.prioridad ?? 'MEDIA')
   const [duracion, setDuracion] = useState(tarea?.duracionEstimadaMin ?? 60)
   const [estado, setEstado] = useState<EstadoTarea>(tarea?.estado ?? 'PENDIENTE')
@@ -66,7 +68,7 @@ export default function FormularioTarea({ tarea, fechaInicial, onGuardar, onCanc
         type="datetime-local"
         value={fechaEntrega}
         onChange={(e) => setFechaEntrega(e.target.value)}
-        min={tarea ? undefined : fechaMinima}
+                min={vencidaSinCambios ? undefined : fechaMinima}
       />
 
       <fieldset>

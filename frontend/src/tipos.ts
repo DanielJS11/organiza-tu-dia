@@ -79,3 +79,17 @@ export type DiaPlanificado = {
 
 // Forma común para dibujar bloques, vengan de una plantilla o de un día ya planificado
 export type BloqueVista = Pick<Bloque, 'tipo' | 'titulo' | 'horaInicio' | 'horaFin'> & { tarea?: TareaResumen | null }
+
+
+// Resultado del motor de reglas para "Por dónde empezar"
+export type EstadoPrioridad = 'vencida' | 'en_riesgo' | 'ajustada' | 'a_tiempo' | 'sin_fecha'
+
+export type ResultadoPrioridad = {
+  tareaId: string
+  orden: number
+  estado: EstadoPrioridad
+  disponibleMin: number | null
+  holguraMin: number | null
+  razon: string
+  tarea: Tarea
+}

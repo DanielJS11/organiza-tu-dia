@@ -9,12 +9,14 @@ import TarjetaTarea from '../componentes/tareas/TarjetaTarea'
 import DialogoCompletar from '../componentes/tareas/DialogoCompletar'
 import CalendarioTareas from '../componentes/tareas/CalendarioTareas'
 import Pestanas from '../componentes/Pestanas'
+import PorDondeEmpezar from '../componentes/tareas/PorDondeEmpezar'
 
-type Vista = 'lista' | 'calendario'
+type Vista = 'lista' | 'prioridades' | 'calendario'
 type FiltroEstado = 'pendientes' | 'completadas' | 'todas'
 
 const vistas: { valor: Vista; nombre: string }[] = [
-  { valor: 'lista', nombre: 'Lista' },
+    { valor: 'lista', nombre: 'Lista' },
+  { valor: 'prioridades', nombre: 'Por dónde empezar' },
   { valor: 'calendario', nombre: 'Calendario' },
 ]
 
@@ -113,6 +115,8 @@ export default function Organiza() {
 
       {cargando ? (
         <p className="mt-8 text-center text-slate-500">Cargando tareas…</p>
+            ) : vista === 'prioridades' ? (
+        <PorDondeEmpezar tareas={tareas} onSeleccionar={setDetalle} />
       ) : vista === 'calendario' ? (
         <div className="mt-6">
           <CalendarioTareas tareas={tareas} onSeleccionarTarea={setDetalle} onSeleccionarFecha={crearDesdeCalendario} />
