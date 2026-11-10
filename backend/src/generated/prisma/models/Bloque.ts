@@ -405,10 +405,6 @@ export type BloqueUncheckedUpdateManyWithoutDiaNestedInput = {
   deleteMany?: Prisma.BloqueScalarWhereInput | Prisma.BloqueScalarWhereInput[]
 }
 
-export type NullableStringFieldUpdateOperationsInput = {
-  set?: string | null
-}
-
 export type BloqueCreateNestedManyWithoutTareaInput = {
   create?: Prisma.XOR<Prisma.BloqueCreateWithoutTareaInput, Prisma.BloqueUncheckedCreateWithoutTareaInput> | Prisma.BloqueCreateWithoutTareaInput[] | Prisma.BloqueUncheckedCreateWithoutTareaInput[]
   connectOrCreate?: Prisma.BloqueCreateOrConnectWithoutTareaInput | Prisma.BloqueCreateOrConnectWithoutTareaInput[]

@@ -50,6 +50,11 @@ model Usuario {
   horaFin        String   @default("22:00")
   iaActivada     Boolean  @default(true)
   creadoEn       DateTime @default(now())
+  // Recuperación de contraseña: se guarda el hash del token (nunca el token) y cuándo vence
+  tokenRecuperacion       String?   @unique
+  tokenRecuperacionExpira DateTime?
+  // Las sesiones abiertas antes de este momento dejan de valer
+  contrasenaCambiadaEn    DateTime?
 
   tareas      Tarea[]
   dias        DiaPlanificado[]

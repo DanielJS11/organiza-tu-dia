@@ -40,6 +40,11 @@ export default function Ingresar() {
     >
       <Campo etiqueta="Correo" type="email" value={correo} onChange={(e) => setCorreo(e.target.value)} required autoComplete="email" />
       <Campo etiqueta="Contraseña" type="password" value={contrasena} onChange={(e) => setContrasena(e.target.value)} required autoComplete="current-password" />
+              <p className="-mt-2 text-right text-sm">
+        <Link to="/recuperar" className="text-teal-700 hover:text-teal-900">
+          ¿Olvidaste tu contraseña?
+        </Link>
+      </p>
     </FormularioAcceso>
   )
 }

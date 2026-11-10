@@ -4,6 +4,8 @@ import rateLimit from 'express-rate-limit'
 import { z } from 'zod'
 import { prisma } from '../db.js'
 import { crearToken, requiereSesion, NOMBRE_COOKIE } from '../middleware/autenticacion.js'
+import { correoRecuperacion, enviarCorreo } from '../utilidades/correo.js'
+import { crearTokenRecuperacion, hashToken, MINUTOS_VALIDEZ_RECUPERACION } from '../utilidades/tokens.js'
 
 const router = Router()
 const enProduccion = process.env.NODE_ENV === 'production'
@@ -15,10 +17,12 @@ const limiteIntentos = rateLimit({
   message: { error: 'Demasiados intentos. Espera unos minutos.' },
 })
 
+const esquemaContrasena = z.string().min(8, 'La contraseña debe tener al menos 8 caracteres').max(72)
+
 const esquemaRegistro = z.object({
   nombre: z.string().trim().min(2, 'El nombre debe tener al menos 2 caracteres').max(60),
   correo: z.string().trim().toLowerCase().email('Correo no válido'),
-  contrasena: z.string().min(8, 'La contraseña debe tener al menos 8 caracteres').max(72),
+    contrasena: esquemaContrasena,
 })
 
 const esquemaIngreso = z.object({
@@ -83,6 +87,52 @@ router.post('/login', limiteIntentos, async (req, res) => {
   guardarSesion(res, usuario.id)
   const { hashContrasena: _h, creadoEn: _c, ...publico } = usuario
   res.json(publico)
+})
+
+// ─── Recuperar la contraseña ───────────────────────────────
+
+// Paso 1: pedir el enlace. La respuesta es siempre la misma, exista o no la cuenta,
+// para no revelar qué correos están registrados.
+router.post('/olvide', limiteIntentos, async (req, res) => {
+  const resultado = z.object({ correo: z.string().trim().toLowerCase().email('Correo no válido') }).safeParse(req.body)
+  if (!resultado.success) return res.status(400).json({ error: resultado.error.issues[0].message })
+
+  const usuario = await prisma.usuario.findUnique({ where: { correo: resultado.data.correo } })
+  if (usuario) {
+    const { token, hash, expira } = crearTokenRecuperacion()
+    await prisma.usuario.update({ where: { id: usuario.id }, data: { tokenRecuperacion: hash, tokenRecuperacionExpira: expira } })
+    const enlace = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/restablecer?token=${token}`
+    try {
+      await enviarCorreo({ para: usuario.correo, ...correoRecuperacion(usuario.nombre, enlace, MINUTOS_VALIDEZ_RECUPERACION) })
+    } catch (error) {
+      console.error('[correo] No se pudo enviar el correo de recuperación:', (error as Error).message)
+    }
+  }
+  res.json({ mensaje: 'Si ese correo tiene una cuenta, te enviamos un enlace para restablecer la contraseña. Revisa también la carpeta de spam.' })
+})
+
+// Paso 2: elegir la nueva contraseña con el token del enlace (vale una sola vez y por tiempo limitado)
+router.post('/restablecer', limiteIntentos, async (req, res) => {
+  const resultado = z.object({ token: z.string().min(20).max(200), contrasena: esquemaContrasena }).safeParse(req.body)
+  if (!resultado.success) return res.status(400).json({ error: resultado.error.issues[0].message })
+
+  const usuario = await prisma.usuario.findUnique({ where: { tokenRecuperacion: hashToken(resultado.data.token) } })
+  if (!usuario || !usuario.tokenRecuperacionExpira || usuario.tokenRecuperacionExpira < new Date()) {
+    return res.status(400).json({ error: 'El enlace no es válido o ya venció. Pide uno nuevo.' })
+  }
+
+  const actualizado = await prisma.usuario.update({
+    where: { id: usuario.id },
+    data: {
+      hashContrasena: await bcrypt.hash(resultado.data.contrasena, 10),
+      tokenRecuperacion: null,
+      tokenRecuperacionExpira: null,
+      contrasenaCambiadaEn: new Date(), // cierra las sesiones abiertas con la contraseña anterior
+    },
+    select: camposPublicos,
+  })
+  guardarSesion(res, actualizado.id)
+  res.json(actualizado)
 })
 
 router.post('/logout', (_req, res) => {

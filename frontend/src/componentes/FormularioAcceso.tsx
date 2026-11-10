@@ -21,7 +21,7 @@ export default function FormularioAcceso({ titulo, subtitulo, textoBoton, error,
           <p className="mt-1 text-sm text-slate-500">{subtitulo}</p>
         </div>
         {children}
-        {error && <p className="text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2">{error}</p>}
+                {error && <p role="alert" className="text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2">{error}</p>}
         <button
           type="submit"
           disabled={enviando}

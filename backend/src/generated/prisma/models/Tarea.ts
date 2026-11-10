@@ -569,10 +569,6 @@ export type TareaUpdateOneWithoutBloquesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.TareaUpdateToOneWithWhereWithoutBloquesInput, Prisma.TareaUpdateWithoutBloquesInput>, Prisma.TareaUncheckedUpdateWithoutBloquesInput>
 }
 
-export type NullableDateTimeFieldUpdateOperationsInput = {
-  set?: Date | string | null
-}
-
 export type EnumPrioridadFieldUpdateOperationsInput = {
   set?: $Enums.Prioridad
 }

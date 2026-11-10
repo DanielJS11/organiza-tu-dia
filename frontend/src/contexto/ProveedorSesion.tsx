@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from 'react'
-import { api } from '../api'
+import { api, EVENTO_SESION_EXPIRADA } from '../api'
 import type { Usuario } from '../tipos'
 import { Sesion } from './contextoSesion'
 
@@ -13,6 +13,14 @@ export default function ProveedorSesion({ children }: { children: ReactNode }) {
       .then(setUsuario)
       .catch(() => setUsuario(null))
       .finally(() => setCargando(false))
+  }, [])
+
+  
+  // Si una petición responde que la sesión ya no vale, se cierra aquí también
+  useEffect(() => {
+    const cerrar = () => setUsuario(null)
+    window.addEventListener(EVENTO_SESION_EXPIRADA, cerrar)
+    return () => window.removeEventListener(EVENTO_SESION_EXPIRADA, cerrar)
   }, [])
 
   async function ingresar(correo: string, contrasena: string) {
@@ -31,6 +39,11 @@ export default function ProveedorSesion({ children }: { children: ReactNode }) {
     setUsuario(datos)
   }
 
+    // Elige una contraseña nueva con el enlace del correo; el backend deja la sesión iniciada
+  async function restablecer(token: string, contrasena: string) {
+    setUsuario(await api<Usuario>('/auth/restablecer', { method: 'POST', body: JSON.stringify({ token, contrasena }) }))
+  }
+
     // Activa o desactiva la IA para este usuario
   async function cambiarIA(iaActivada: boolean) {
     setUsuario(await api<Usuario>('/auth/preferencias', { method: 'PATCH', body: JSON.stringify({ iaActivada }) }))
@@ -42,7 +55,7 @@ export default function ProveedorSesion({ children }: { children: ReactNode }) {
   }
 
   return (
-    <Sesion.Provider value={{ usuario, cargando, ingresar, registrar, salir, cambiarIA }}>
+        <Sesion.Provider value={{ usuario, cargando, ingresar, registrar, salir, cambiarIA, restablecer }}>
             {children}
     </Sesion.Provider>
   )

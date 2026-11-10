@@ -87,7 +87,10 @@ export const UsuarioScalarFieldEnum = {
   horaInicio: 'horaInicio',
   horaFin: 'horaFin',
   iaActivada: 'iaActivada',
-  creadoEn: 'creadoEn'
+  creadoEn: 'creadoEn',
+  tokenRecuperacion: 'tokenRecuperacion',
+  tokenRecuperacionExpira: 'tokenRecuperacionExpira',
+  contrasenaCambiadaEn: 'contrasenaCambiadaEn'
 } as const
 
 export type UsuarioScalarFieldEnum = (typeof UsuarioScalarFieldEnum)[keyof typeof UsuarioScalarFieldEnum]

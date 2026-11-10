@@ -8,6 +8,7 @@ export type ContextoSesion = {
   registrar: (nombre: string, correo: string, contrasena: string) => Promise<void>
   salir: () => Promise<void>
     cambiarIA: (activada: boolean) => Promise<void>
+      restablecer: (token: string, contrasena: string) => Promise<void>
 }
 
 export const Sesion = createContext<ContextoSesion | null>(null)

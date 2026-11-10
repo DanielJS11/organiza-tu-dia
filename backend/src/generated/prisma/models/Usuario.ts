@@ -34,6 +34,9 @@ export type UsuarioMinAggregateOutputType = {
   horaFin: string | null
   iaActivada: boolean | null
   creadoEn: Date | null
+  tokenRecuperacion: string | null
+  tokenRecuperacionExpira: Date | null
+  contrasenaCambiadaEn: Date | null
 }
 
 export type UsuarioMaxAggregateOutputType = {
@@ -46,6 +49,9 @@ export type UsuarioMaxAggregateOutputType = {
   horaFin: string | null
   iaActivada: boolean | null
   creadoEn: Date | null
+  tokenRecuperacion: string | null
+  tokenRecuperacionExpira: Date | null
+  contrasenaCambiadaEn: Date | null
 }
 
 export type UsuarioCountAggregateOutputType = {
@@ -58,6 +64,9 @@ export type UsuarioCountAggregateOutputType = {
   horaFin: number
   iaActivada: number
   creadoEn: number
+  tokenRecuperacion: number
+  tokenRecuperacionExpira: number
+  contrasenaCambiadaEn: number
   _all: number
 }
 
@@ -72,6 +81,9 @@ export type UsuarioMinAggregateInputType = {
   horaFin?: true
   iaActivada?: true
   creadoEn?: true
+  tokenRecuperacion?: true
+  tokenRecuperacionExpira?: true
+  contrasenaCambiadaEn?: true
 }
 
 export type UsuarioMaxAggregateInputType = {
@@ -84,6 +96,9 @@ export type UsuarioMaxAggregateInputType = {
   horaFin?: true
   iaActivada?: true
   creadoEn?: true
+  tokenRecuperacion?: true
+  tokenRecuperacionExpira?: true
+  contrasenaCambiadaEn?: true
 }
 
 export type UsuarioCountAggregateInputType = {
@@ -96,6 +111,9 @@ export type UsuarioCountAggregateInputType = {
   horaFin?: true
   iaActivada?: true
   creadoEn?: true
+  tokenRecuperacion?: true
+  tokenRecuperacionExpira?: true
+  contrasenaCambiadaEn?: true
   _all?: true
 }
 
@@ -181,6 +199,9 @@ export type UsuarioGroupByOutputType = {
   horaFin: string
   iaActivada: boolean
   creadoEn: Date
+  tokenRecuperacion: string | null
+  tokenRecuperacionExpira: Date | null
+  contrasenaCambiadaEn: Date | null
   _count: UsuarioCountAggregateOutputType | null
   _min: UsuarioMinAggregateOutputType | null
   _max: UsuarioMaxAggregateOutputType | null
@@ -214,6 +235,9 @@ export type UsuarioWhereInput = {
   horaFin?: Prisma.StringFilter<"Usuario"> | string
   iaActivada?: Prisma.BoolFilter<"Usuario"> | boolean
   creadoEn?: Prisma.DateTimeFilter<"Usuario"> | Date | string
+  tokenRecuperacion?: Prisma.StringNullableFilter<"Usuario"> | string | null
+  tokenRecuperacionExpira?: Prisma.DateTimeNullableFilter<"Usuario"> | Date | string | null
+  contrasenaCambiadaEn?: Prisma.DateTimeNullableFilter<"Usuario"> | Date | string | null
   tareas?: Prisma.TareaListRelationFilter
   dias?: Prisma.DiaPlanificadoListRelationFilter
   entradas?: Prisma.EntradaDiarioListRelationFilter
@@ -231,6 +255,9 @@ export type UsuarioOrderByWithRelationInput = {
   horaFin?: Prisma.SortOrder
   iaActivada?: Prisma.SortOrder
   creadoEn?: Prisma.SortOrder
+  tokenRecuperacion?: Prisma.SortOrderInput | Prisma.SortOrder
+  tokenRecuperacionExpira?: Prisma.SortOrderInput | Prisma.SortOrder
+  contrasenaCambiadaEn?: Prisma.SortOrderInput | Prisma.SortOrder
   tareas?: Prisma.TareaOrderByRelationAggregateInput
   dias?: Prisma.DiaPlanificadoOrderByRelationAggregateInput
   entradas?: Prisma.EntradaDiarioOrderByRelationAggregateInput
@@ -241,6 +268,7 @@ export type UsuarioOrderByWithRelationInput = {
 export type UsuarioWhereUniqueInput = Prisma.AtLeast<{
   id?: string
   correo?: string
+  tokenRecuperacion?: string
   AND?: Prisma.UsuarioWhereInput | Prisma.UsuarioWhereInput[]
   OR?: Prisma.UsuarioWhereInput[]
   NOT?: Prisma.UsuarioWhereInput | Prisma.UsuarioWhereInput[]
@@ -251,12 +279,14 @@ export type UsuarioWhereUniqueInput = Prisma.AtLeast<{
   horaFin?: Prisma.StringFilter<"Usuario"> | string
   iaActivada?: Prisma.BoolFilter<"Usuario"> | boolean
   creadoEn?: Prisma.DateTimeFilter<"Usuario"> | Date | string
+  tokenRecuperacionExpira?: Prisma.DateTimeNullableFilter<"Usuario"> | Date | string | null
+  contrasenaCambiadaEn?: Prisma.DateTimeNullableFilter<"Usuario"> | Date | string | null
   tareas?: Prisma.TareaListRelationFilter
   dias?: Prisma.DiaPlanificadoListRelationFilter
   entradas?: Prisma.EntradaDiarioListRelationFilter
   etiquetas?: Prisma.EtiquetaListRelationFilter
   sugerencias?: Prisma.SugerenciaListRelationFilter
-}, "id" | "correo">
+}, "id" | "correo" | "tokenRecuperacion">
 
 export type UsuarioOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -268,6 +298,9 @@ export type UsuarioOrderByWithAggregationInput = {
   horaFin?: Prisma.SortOrder
   iaActivada?: Prisma.SortOrder
   creadoEn?: Prisma.SortOrder
+  tokenRecuperacion?: Prisma.SortOrderInput | Prisma.SortOrder
+  tokenRecuperacionExpira?: Prisma.SortOrderInput | Prisma.SortOrder
+  contrasenaCambiadaEn?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.UsuarioCountOrderByAggregateInput
   _max?: Prisma.UsuarioMaxOrderByAggregateInput
   _min?: Prisma.UsuarioMinOrderByAggregateInput
@@ -286,6 +319,9 @@ export type UsuarioScalarWhereWithAggregatesInput = {
   horaFin?: Prisma.StringWithAggregatesFilter<"Usuario"> | string
   iaActivada?: Prisma.BoolWithAggregatesFilter<"Usuario"> | boolean
   creadoEn?: Prisma.DateTimeWithAggregatesFilter<"Usuario"> | Date | string
+  tokenRecuperacion?: Prisma.StringNullableWithAggregatesFilter<"Usuario"> | string | null
+  tokenRecuperacionExpira?: Prisma.DateTimeNullableWithAggregatesFilter<"Usuario"> | Date | string | null
+  contrasenaCambiadaEn?: Prisma.DateTimeNullableWithAggregatesFilter<"Usuario"> | Date | string | null
 }
 
 export type UsuarioCreateInput = {
@@ -298,6 +334,9 @@ export type UsuarioCreateInput = {
   horaFin?: string
   iaActivada?: boolean
   creadoEn?: Date | string
+  tokenRecuperacion?: string | null
+  tokenRecuperacionExpira?: Date | string | null
+  contrasenaCambiadaEn?: Date | string | null
   tareas?: Prisma.TareaCreateNestedManyWithoutUsuarioInput
   dias?: Prisma.DiaPlanificadoCreateNestedManyWithoutUsuarioInput
   entradas?: Prisma.EntradaDiarioCreateNestedManyWithoutUsuarioInput
@@ -315,6 +354,9 @@ export type UsuarioUncheckedCreateInput = {
   horaFin?: string
   iaActivada?: boolean
   creadoEn?: Date | string
+  tokenRecuperacion?: string | null
+  tokenRecuperacionExpira?: Date | string | null
+  contrasenaCambiadaEn?: Date | string | null
   tareas?: Prisma.TareaUncheckedCreateNestedManyWithoutUsuarioInput
   dias?: Prisma.DiaPlanificadoUncheckedCreateNestedManyWithoutUsuarioInput
   entradas?: Prisma.EntradaDiarioUncheckedCreateNestedManyWithoutUsuarioInput
@@ -332,6 +374,9 @@ export type UsuarioUpdateInput = {
   horaFin?: Prisma.StringFieldUpdateOperationsInput | string
   iaActivada?: Prisma.BoolFieldUpdateOperationsInput | boolean
   creadoEn?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tokenRecuperacion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tokenRecuperacionExpira?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  contrasenaCambiadaEn?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   tareas?: Prisma.TareaUpdateManyWithoutUsuarioNestedInput
   dias?: Prisma.DiaPlanificadoUpdateManyWithoutUsuarioNestedInput
   entradas?: Prisma.EntradaDiarioUpdateManyWithoutUsuarioNestedInput
@@ -349,6 +394,9 @@ export type UsuarioUncheckedUpdateInput = {
   horaFin?: Prisma.StringFieldUpdateOperationsInput | string
   iaActivada?: Prisma.BoolFieldUpdateOperationsInput | boolean
   creadoEn?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tokenRecuperacion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tokenRecuperacionExpira?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  contrasenaCambiadaEn?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   tareas?: Prisma.TareaUncheckedUpdateManyWithoutUsuarioNestedInput
   dias?: Prisma.DiaPlanificadoUncheckedUpdateManyWithoutUsuarioNestedInput
   entradas?: Prisma.EntradaDiarioUncheckedUpdateManyWithoutUsuarioNestedInput
@@ -366,6 +414,9 @@ export type UsuarioCreateManyInput = {
   horaFin?: string
   iaActivada?: boolean
   creadoEn?: Date | string
+  tokenRecuperacion?: string | null
+  tokenRecuperacionExpira?: Date | string | null
+  contrasenaCambiadaEn?: Date | string | null
 }
 
 export type UsuarioUpdateManyMutationInput = {
@@ -378,6 +429,9 @@ export type UsuarioUpdateManyMutationInput = {
   horaFin?: Prisma.StringFieldUpdateOperationsInput | string
   iaActivada?: Prisma.BoolFieldUpdateOperationsInput | boolean
   creadoEn?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tokenRecuperacion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tokenRecuperacionExpira?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  contrasenaCambiadaEn?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type UsuarioUncheckedUpdateManyInput = {
@@ -390,6 +444,9 @@ export type UsuarioUncheckedUpdateManyInput = {
   horaFin?: Prisma.StringFieldUpdateOperationsInput | string
   iaActivada?: Prisma.BoolFieldUpdateOperationsInput | boolean
   creadoEn?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tokenRecuperacion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tokenRecuperacionExpira?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  contrasenaCambiadaEn?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type UsuarioCountOrderByAggregateInput = {
@@ -402,6 +459,9 @@ export type UsuarioCountOrderByAggregateInput = {
   horaFin?: Prisma.SortOrder
   iaActivada?: Prisma.SortOrder
   creadoEn?: Prisma.SortOrder
+  tokenRecuperacion?: Prisma.SortOrder
+  tokenRecuperacionExpira?: Prisma.SortOrder
+  contrasenaCambiadaEn?: Prisma.SortOrder
 }
 
 export type UsuarioMaxOrderByAggregateInput = {
@@ -414,6 +474,9 @@ export type UsuarioMaxOrderByAggregateInput = {
   horaFin?: Prisma.SortOrder
   iaActivada?: Prisma.SortOrder
   creadoEn?: Prisma.SortOrder
+  tokenRecuperacion?: Prisma.SortOrder
+  tokenRecuperacionExpira?: Prisma.SortOrder
+  contrasenaCambiadaEn?: Prisma.SortOrder
 }
 
 export type UsuarioMinOrderByAggregateInput = {
@@ -426,6 +489,9 @@ export type UsuarioMinOrderByAggregateInput = {
   horaFin?: Prisma.SortOrder
   iaActivada?: Prisma.SortOrder
   creadoEn?: Prisma.SortOrder
+  tokenRecuperacion?: Prisma.SortOrder
+  tokenRecuperacionExpira?: Prisma.SortOrder
+  contrasenaCambiadaEn?: Prisma.SortOrder
 }
 
 export type UsuarioScalarRelationFilter = {
@@ -443,6 +509,14 @@ export type BoolFieldUpdateOperationsInput = {
 
 export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
+}
+
+export type NullableStringFieldUpdateOperationsInput = {
+  set?: string | null
+}
+
+export type NullableDateTimeFieldUpdateOperationsInput = {
+  set?: Date | string | null
 }
 
 export type UsuarioCreateNestedOneWithoutDiasInput = {
@@ -525,6 +599,9 @@ export type UsuarioCreateWithoutDiasInput = {
   horaFin?: string
   iaActivada?: boolean
   creadoEn?: Date | string
+  tokenRecuperacion?: string | null
+  tokenRecuperacionExpira?: Date | string | null
+  contrasenaCambiadaEn?: Date | string | null
   tareas?: Prisma.TareaCreateNestedManyWithoutUsuarioInput
   entradas?: Prisma.EntradaDiarioCreateNestedManyWithoutUsuarioInput
   etiquetas?: Prisma.EtiquetaCreateNestedManyWithoutUsuarioInput
@@ -541,6 +618,9 @@ export type UsuarioUncheckedCreateWithoutDiasInput = {
   horaFin?: string
   iaActivada?: boolean
   creadoEn?: Date | string
+  tokenRecuperacion?: string | null
+  tokenRecuperacionExpira?: Date | string | null
+  contrasenaCambiadaEn?: Date | string | null
   tareas?: Prisma.TareaUncheckedCreateNestedManyWithoutUsuarioInput
   entradas?: Prisma.EntradaDiarioUncheckedCreateNestedManyWithoutUsuarioInput
   etiquetas?: Prisma.EtiquetaUncheckedCreateNestedManyWithoutUsuarioInput
@@ -573,6 +653,9 @@ export type UsuarioUpdateWithoutDiasInput = {
   horaFin?: Prisma.StringFieldUpdateOperationsInput | string
   iaActivada?: Prisma.BoolFieldUpdateOperationsInput | boolean
   creadoEn?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tokenRecuperacion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tokenRecuperacionExpira?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  contrasenaCambiadaEn?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   tareas?: Prisma.TareaUpdateManyWithoutUsuarioNestedInput
   entradas?: Prisma.EntradaDiarioUpdateManyWithoutUsuarioNestedInput
   etiquetas?: Prisma.EtiquetaUpdateManyWithoutUsuarioNestedInput
@@ -589,6 +672,9 @@ export type UsuarioUncheckedUpdateWithoutDiasInput = {
   horaFin?: Prisma.StringFieldUpdateOperationsInput | string
   iaActivada?: Prisma.BoolFieldUpdateOperationsInput | boolean
   creadoEn?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tokenRecuperacion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tokenRecuperacionExpira?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  contrasenaCambiadaEn?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   tareas?: Prisma.TareaUncheckedUpdateManyWithoutUsuarioNestedInput
   entradas?: Prisma.EntradaDiarioUncheckedUpdateManyWithoutUsuarioNestedInput
   etiquetas?: Prisma.EtiquetaUncheckedUpdateManyWithoutUsuarioNestedInput
@@ -605,6 +691,9 @@ export type UsuarioCreateWithoutTareasInput = {
   horaFin?: string
   iaActivada?: boolean
   creadoEn?: Date | string
+  tokenRecuperacion?: string | null
+  tokenRecuperacionExpira?: Date | string | null
+  contrasenaCambiadaEn?: Date | string | null
   dias?: Prisma.DiaPlanificadoCreateNestedManyWithoutUsuarioInput
   entradas?: Prisma.EntradaDiarioCreateNestedManyWithoutUsuarioInput
   etiquetas?: Prisma.EtiquetaCreateNestedManyWithoutUsuarioInput
@@ -621,6 +710,9 @@ export type UsuarioUncheckedCreateWithoutTareasInput = {
   horaFin?: string
   iaActivada?: boolean
   creadoEn?: Date | string
+  tokenRecuperacion?: string | null
+  tokenRecuperacionExpira?: Date | string | null
+  contrasenaCambiadaEn?: Date | string | null
   dias?: Prisma.DiaPlanificadoUncheckedCreateNestedManyWithoutUsuarioInput
   entradas?: Prisma.EntradaDiarioUncheckedCreateNestedManyWithoutUsuarioInput
   etiquetas?: Prisma.EtiquetaUncheckedCreateNestedManyWithoutUsuarioInput
@@ -653,6 +745,9 @@ export type UsuarioUpdateWithoutTareasInput = {
   horaFin?: Prisma.StringFieldUpdateOperationsInput | string
   iaActivada?: Prisma.BoolFieldUpdateOperationsInput | boolean
   creadoEn?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tokenRecuperacion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tokenRecuperacionExpira?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  contrasenaCambiadaEn?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   dias?: Prisma.DiaPlanificadoUpdateManyWithoutUsuarioNestedInput
   entradas?: Prisma.EntradaDiarioUpdateManyWithoutUsuarioNestedInput
   etiquetas?: Prisma.EtiquetaUpdateManyWithoutUsuarioNestedInput
@@ -669,6 +764,9 @@ export type UsuarioUncheckedUpdateWithoutTareasInput = {
   horaFin?: Prisma.StringFieldUpdateOperationsInput | string
   iaActivada?: Prisma.BoolFieldUpdateOperationsInput | boolean
   creadoEn?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tokenRecuperacion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tokenRecuperacionExpira?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  contrasenaCambiadaEn?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   dias?: Prisma.DiaPlanificadoUncheckedUpdateManyWithoutUsuarioNestedInput
   entradas?: Prisma.EntradaDiarioUncheckedUpdateManyWithoutUsuarioNestedInput
   etiquetas?: Prisma.EtiquetaUncheckedUpdateManyWithoutUsuarioNestedInput
@@ -685,6 +783,9 @@ export type UsuarioCreateWithoutEntradasInput = {
   horaFin?: string
   iaActivada?: boolean
   creadoEn?: Date | string
+  tokenRecuperacion?: string | null
+  tokenRecuperacionExpira?: Date | string | null
+  contrasenaCambiadaEn?: Date | string | null
   tareas?: Prisma.TareaCreateNestedManyWithoutUsuarioInput
   dias?: Prisma.DiaPlanificadoCreateNestedManyWithoutUsuarioInput
   etiquetas?: Prisma.EtiquetaCreateNestedManyWithoutUsuarioInput
@@ -701,6 +802,9 @@ export type UsuarioUncheckedCreateWithoutEntradasInput = {
   horaFin?: string
   iaActivada?: boolean
   creadoEn?: Date | string
+  tokenRecuperacion?: string | null
+  tokenRecuperacionExpira?: Date | string | null
+  contrasenaCambiadaEn?: Date | string | null
   tareas?: Prisma.TareaUncheckedCreateNestedManyWithoutUsuarioInput
   dias?: Prisma.DiaPlanificadoUncheckedCreateNestedManyWithoutUsuarioInput
   etiquetas?: Prisma.EtiquetaUncheckedCreateNestedManyWithoutUsuarioInput
@@ -733,6 +837,9 @@ export type UsuarioUpdateWithoutEntradasInput = {
   horaFin?: Prisma.StringFieldUpdateOperationsInput | string
   iaActivada?: Prisma.BoolFieldUpdateOperationsInput | boolean
   creadoEn?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tokenRecuperacion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tokenRecuperacionExpira?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  contrasenaCambiadaEn?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   tareas?: Prisma.TareaUpdateManyWithoutUsuarioNestedInput
   dias?: Prisma.DiaPlanificadoUpdateManyWithoutUsuarioNestedInput
   etiquetas?: Prisma.EtiquetaUpdateManyWithoutUsuarioNestedInput
@@ -749,6 +856,9 @@ export type UsuarioUncheckedUpdateWithoutEntradasInput = {
   horaFin?: Prisma.StringFieldUpdateOperationsInput | string
   iaActivada?: Prisma.BoolFieldUpdateOperationsInput | boolean
   creadoEn?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tokenRecuperacion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tokenRecuperacionExpira?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  contrasenaCambiadaEn?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   tareas?: Prisma.TareaUncheckedUpdateManyWithoutUsuarioNestedInput
   dias?: Prisma.DiaPlanificadoUncheckedUpdateManyWithoutUsuarioNestedInput
   etiquetas?: Prisma.EtiquetaUncheckedUpdateManyWithoutUsuarioNestedInput
@@ -765,6 +875,9 @@ export type UsuarioCreateWithoutEtiquetasInput = {
   horaFin?: string
   iaActivada?: boolean
   creadoEn?: Date | string
+  tokenRecuperacion?: string | null
+  tokenRecuperacionExpira?: Date | string | null
+  contrasenaCambiadaEn?: Date | string | null
   tareas?: Prisma.TareaCreateNestedManyWithoutUsuarioInput
   dias?: Prisma.DiaPlanificadoCreateNestedManyWithoutUsuarioInput
   entradas?: Prisma.EntradaDiarioCreateNestedManyWithoutUsuarioInput
@@ -781,6 +894,9 @@ export type UsuarioUncheckedCreateWithoutEtiquetasInput = {
   horaFin?: string
   iaActivada?: boolean
   creadoEn?: Date | string
+  tokenRecuperacion?: string | null
+  tokenRecuperacionExpira?: Date | string | null
+  contrasenaCambiadaEn?: Date | string | null
   tareas?: Prisma.TareaUncheckedCreateNestedManyWithoutUsuarioInput
   dias?: Prisma.DiaPlanificadoUncheckedCreateNestedManyWithoutUsuarioInput
   entradas?: Prisma.EntradaDiarioUncheckedCreateNestedManyWithoutUsuarioInput
@@ -813,6 +929,9 @@ export type UsuarioUpdateWithoutEtiquetasInput = {
   horaFin?: Prisma.StringFieldUpdateOperationsInput | string
   iaActivada?: Prisma.BoolFieldUpdateOperationsInput | boolean
   creadoEn?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tokenRecuperacion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tokenRecuperacionExpira?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  contrasenaCambiadaEn?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   tareas?: Prisma.TareaUpdateManyWithoutUsuarioNestedInput
   dias?: Prisma.DiaPlanificadoUpdateManyWithoutUsuarioNestedInput
   entradas?: Prisma.EntradaDiarioUpdateManyWithoutUsuarioNestedInput
@@ -829,6 +948,9 @@ export type UsuarioUncheckedUpdateWithoutEtiquetasInput = {
   horaFin?: Prisma.StringFieldUpdateOperationsInput | string
   iaActivada?: Prisma.BoolFieldUpdateOperationsInput | boolean
   creadoEn?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tokenRecuperacion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tokenRecuperacionExpira?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  contrasenaCambiadaEn?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   tareas?: Prisma.TareaUncheckedUpdateManyWithoutUsuarioNestedInput
   dias?: Prisma.DiaPlanificadoUncheckedUpdateManyWithoutUsuarioNestedInput
   entradas?: Prisma.EntradaDiarioUncheckedUpdateManyWithoutUsuarioNestedInput
@@ -845,6 +967,9 @@ export type UsuarioCreateWithoutSugerenciasInput = {
   horaFin?: string
   iaActivada?: boolean
   creadoEn?: Date | string
+  tokenRecuperacion?: string | null
+  tokenRecuperacionExpira?: Date | string | null
+  contrasenaCambiadaEn?: Date | string | null
   tareas?: Prisma.TareaCreateNestedManyWithoutUsuarioInput
   dias?: Prisma.DiaPlanificadoCreateNestedManyWithoutUsuarioInput
   entradas?: Prisma.EntradaDiarioCreateNestedManyWithoutUsuarioInput
@@ -861,6 +986,9 @@ export type UsuarioUncheckedCreateWithoutSugerenciasInput = {
   horaFin?: string
   iaActivada?: boolean
   creadoEn?: Date | string
+  tokenRecuperacion?: string | null
+  tokenRecuperacionExpira?: Date | string | null
+  contrasenaCambiadaEn?: Date | string | null
   tareas?: Prisma.TareaUncheckedCreateNestedManyWithoutUsuarioInput
   dias?: Prisma.DiaPlanificadoUncheckedCreateNestedManyWithoutUsuarioInput
   entradas?: Prisma.EntradaDiarioUncheckedCreateNestedManyWithoutUsuarioInput
@@ -893,6 +1021,9 @@ export type UsuarioUpdateWithoutSugerenciasInput = {
   horaFin?: Prisma.StringFieldUpdateOperationsInput | string
   iaActivada?: Prisma.BoolFieldUpdateOperationsInput | boolean
   creadoEn?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tokenRecuperacion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tokenRecuperacionExpira?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  contrasenaCambiadaEn?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   tareas?: Prisma.TareaUpdateManyWithoutUsuarioNestedInput
   dias?: Prisma.DiaPlanificadoUpdateManyWithoutUsuarioNestedInput
   entradas?: Prisma.EntradaDiarioUpdateManyWithoutUsuarioNestedInput
@@ -909,6 +1040,9 @@ export type UsuarioUncheckedUpdateWithoutSugerenciasInput = {
   horaFin?: Prisma.StringFieldUpdateOperationsInput | string
   iaActivada?: Prisma.BoolFieldUpdateOperationsInput | boolean
   creadoEn?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tokenRecuperacion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tokenRecuperacionExpira?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  contrasenaCambiadaEn?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   tareas?: Prisma.TareaUncheckedUpdateManyWithoutUsuarioNestedInput
   dias?: Prisma.DiaPlanificadoUncheckedUpdateManyWithoutUsuarioNestedInput
   entradas?: Prisma.EntradaDiarioUncheckedUpdateManyWithoutUsuarioNestedInput
@@ -992,6 +1126,9 @@ export type UsuarioSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   horaFin?: boolean
   iaActivada?: boolean
   creadoEn?: boolean
+  tokenRecuperacion?: boolean
+  tokenRecuperacionExpira?: boolean
+  contrasenaCambiadaEn?: boolean
   tareas?: boolean | Prisma.Usuario$tareasArgs<ExtArgs>
   dias?: boolean | Prisma.Usuario$diasArgs<ExtArgs>
   entradas?: boolean | Prisma.Usuario$entradasArgs<ExtArgs>
@@ -1010,6 +1147,9 @@ export type UsuarioSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   horaFin?: boolean
   iaActivada?: boolean
   creadoEn?: boolean
+  tokenRecuperacion?: boolean
+  tokenRecuperacionExpira?: boolean
+  contrasenaCambiadaEn?: boolean
 }, ExtArgs["result"]["usuario"]>
 
 export type UsuarioSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1022,6 +1162,9 @@ export type UsuarioSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   horaFin?: boolean
   iaActivada?: boolean
   creadoEn?: boolean
+  tokenRecuperacion?: boolean
+  tokenRecuperacionExpira?: boolean
+  contrasenaCambiadaEn?: boolean
 }, ExtArgs["result"]["usuario"]>
 
 export type UsuarioSelectScalar = {
@@ -1034,9 +1177,12 @@ export type UsuarioSelectScalar = {
   horaFin?: boolean
   iaActivada?: boolean
   creadoEn?: boolean
+  tokenRecuperacion?: boolean
+  tokenRecuperacionExpira?: boolean
+  contrasenaCambiadaEn?: boolean
 }
 
-export type UsuarioOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "nombre" | "correo" | "hashContrasena" | "zonaHoraria" | "horaInicio" | "horaFin" | "iaActivada" | "creadoEn", ExtArgs["result"]["usuario"]>
+export type UsuarioOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "nombre" | "correo" | "hashContrasena" | "zonaHoraria" | "horaInicio" | "horaFin" | "iaActivada" | "creadoEn" | "tokenRecuperacion" | "tokenRecuperacionExpira" | "contrasenaCambiadaEn", ExtArgs["result"]["usuario"]>
 export type UsuarioInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   tareas?: boolean | Prisma.Usuario$tareasArgs<ExtArgs>
   dias?: boolean | Prisma.Usuario$diasArgs<ExtArgs>
@@ -1067,6 +1213,9 @@ export type $UsuarioPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     horaFin: string
     iaActivada: boolean
     creadoEn: Date
+    tokenRecuperacion: string | null
+    tokenRecuperacionExpira: Date | null
+    contrasenaCambiadaEn: Date | null
   }, ExtArgs["result"]["usuario"]>
   composites: {}
 }
@@ -1504,6 +1653,9 @@ export interface UsuarioFieldRefs {
   readonly horaFin: Prisma.FieldRef<"Usuario", 'String'>
   readonly iaActivada: Prisma.FieldRef<"Usuario", 'Boolean'>
   readonly creadoEn: Prisma.FieldRef<"Usuario", 'DateTime'>
+  readonly tokenRecuperacion: Prisma.FieldRef<"Usuario", 'String'>
+  readonly tokenRecuperacionExpira: Prisma.FieldRef<"Usuario", 'DateTime'>
+  readonly contrasenaCambiadaEn: Prisma.FieldRef<"Usuario", 'DateTime'>
 }
     
 
