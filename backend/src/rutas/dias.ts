@@ -8,7 +8,7 @@ const router = Router()
 router.use(requiereSesion)
 
 // Revisa que la fecha de la dirección (/api/dias/2026-10-23) sea válida
-function validarFecha(req: Request, res: Response, next: NextFunction) {
+export function validarFecha(req: Request, res: Response, next: NextFunction) {
   if (!esFechaValida(String(req.params.fecha))) {
     return res.status(400).json({ error: 'Fecha no válida' })
   }
@@ -16,7 +16,7 @@ function validarFecha(req: Request, res: Response, next: NextFunction) {
 }
 
 // Datos que se devuelven de un día: sus bloques ordenados por hora y el nombre de la plantilla usada
-const incluirDia = {
+export const incluirDia = {
   plantilla: { select: { id: true, nombre: true } },
   bloques: {
     orderBy: { horaInicio: 'asc' as const },
@@ -107,7 +107,7 @@ const esquemaBloque = z
 type DatosBloque = z.infer<typeof esquemaBloque>
 
 // Busca el día del usuario y verifica que se pueda modificar (que exista y no haya pasado)
-async function obtenerDiaEditable(usuarioId: string, fecha: string) {
+export async function obtenerDiaEditable(usuarioId: string, fecha: string) {
   const usuario = await prisma.usuario.findUniqueOrThrow({ where: { id: usuarioId } })
   if (fecha < hoyEnZona(usuario.zonaHoraria)) {
     return { ok: false, estado: 400, error: 'No puedes modificar un día que ya pasó' } as const
@@ -141,7 +141,7 @@ async function validarBloque(
   return null
 }
 
-async function devolverDia(diaId: string) {
+export async function devolverDia(diaId: string) {
   return prisma.diaPlanificado.findUniqueOrThrow({ where: { id: diaId }, include: incluirDia })
 }
 

@@ -44,6 +44,20 @@ export function useDia(fecha: string) {
     setDia(await api<DiaPlanificado>(`/dias/${fecha}/bloques/${id}`, { method: 'DELETE' }))
   }
 
+  // Asigna las sugerencias que el usuario aceptó (todas o algunas)
+  async function aplicarSugerencia(asignaciones: { bloqueId: string; tareaId: string }[], propuestas: number) {
+    setDia(
+      await api<DiaPlanificado>(`/planificacion/dia/${fecha}/aplicar`, {
+        method: 'POST',
+        body: JSON.stringify({ asignaciones, propuestas }),
+      }),
+    )
+  }
+
+  async function descartarSugerencia(propuestas: number) {
+    await api(`/planificacion/dia/${fecha}/descartar`, { method: 'POST', body: JSON.stringify({ propuestas }) })
+  }
+
   return {
     dia,
     cargando: fechaCargada !== fecha,
@@ -53,5 +67,7 @@ export function useDia(fecha: string) {
     agregarBloque,
     editarBloque,
     eliminarBloque,
+    aplicarSugerencia,
+    descartarSugerencia,
   }
 }

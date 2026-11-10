@@ -4,6 +4,15 @@
 // Funciones puras: no leen la base de datos ni el reloj por su cuenta.
 // Todo lo que necesitan llega como parámetro, así se pueden probar con
 // datos inventados y siempre dan el mismo resultado.
+//
+// Modelo en tres reglas:
+//   1. Tiempo disponible realista: en días con plan cuentan los bloques de trabajo;
+//      en días sin plan, la capacidad diaria se reparte a lo largo de la jornada.
+//   2. Si no alcanza para todo, se protege lo más importante: sale la tarea de menor
+//      prioridad (y, si empatan, la más larga). Variante con prioridades del algoritmo
+//      de Moore-Hodgson, que deja a tiempo el mayor número posible de entregas.
+//   3. Orden sugerido = orden de las entregas ("Earliest Deadline First"): si todo lo
+//      que queda en la lista cabe, siguiéndola en ese orden se cumplen todas las entregas.
 // ─────────────────────────────────────────────────────────────
 
 export type Prioridad = 'ALTA' | 'MEDIA' | 'BAJA'
@@ -30,19 +39,21 @@ export type ContextoMotor = {
   diasPlanificados: Map<string, Intervalo[]>
 }
 
-export type EstadoPrioridad = 'vencida' | 'en_riesgo' | 'ajustada' | 'a_tiempo' | 'sin_fecha'
+// vencida y no_alcanza → "Necesitan una decisión"; a_tiempo y ajustada → "Orden sugerido"
+export type EstadoPrioridad = 'vencida' | 'no_alcanza' | 'ajustada' | 'a_tiempo' | 'sin_fecha'
 
 export type ResultadoPrioridad = {
   tareaId: string
-  orden: number
+  orden: number | null // posición en el orden sugerido (solo para las tareas que caben)
   estado: EstadoPrioridad
   disponibleMin: number | null // tiempo de trabajo disponible desde ahora hasta la entrega
-  holguraMin: number | null // margen que queda contando las tareas que vencen antes
+  holguraMin: number | null // margen que queda siguiendo el orden sugerido
   razon: string
 }
 
 export const MINUTOS_DIA = 24 * 60
-const MARGEN_AJUSTADO_MIN = 120 // con menos de 2 h de margen, la tarea se considera "ajustada"
+const MARGEN_MINIMO_MIN = 60 // con menos de 1 h de margen la tarea queda "ajustada"…
+const MARGEN_RELATIVO = 0.25 // …o con menos del 25 % de lo que dura (solemos subestimar cuánto tardamos)
 const VALOR_PRIORIDAD: Record<Prioridad, number> = { ALTA: 0, MEDIA: 1, BAJA: 2 }
 const NOMBRE_PRIORIDAD: Record<Prioridad, string> = { ALTA: 'alta', MEDIA: 'media', BAJA: 'baja' }
 
@@ -82,15 +93,16 @@ function solapamiento(a: Intervalo, b: Intervalo) {
   return Math.max(0, Math.min(a.fin, b.fin) - Math.max(a.inicio, b.inicio))
 }
 
-// 150 → "2 h 30 min"
+// 150 → "2 h 30 min" (redondea al minuto)
 export function formatearMinutos(minutos: number) {
-  const h = Math.floor(minutos / 60)
-  const m = minutos % 60
+  const total = Math.round(minutos)
+  const h = Math.floor(total / 60)
+  const m = total % 60
   if (h === 0) return `${m} min`
   return m === 0 ? `${h} h` : `${h} h ${m} min`
 }
 
-// ─── Tiempo disponible ─────────────────────────────────────
+// ─── Regla 1: tiempo disponible realista ───────────────────
 
 // Minutos de trabajo de UN día dentro de una ventana de ese día
 export function disponibleEnDia(fecha: string, ventana: Intervalo, ctx: ContextoMotor) {
@@ -99,8 +111,11 @@ export function disponibleEnDia(fecha: string, ventana: Intervalo, ctx: Contexto
     // Día con plan: cuentan sus bloques de estudio, trabajo y enfoque
     return bloques.reduce((total, b) => total + solapamiento(b, ventana), 0)
   }
-  // Día sin plan: la capacidad por defecto, sin salirse de la jornada
-  return Math.min(ctx.capacidadPorDefectoMin, solapamiento(ctx.jornada, ventana))
+  // Día sin plan: la capacidad diaria se reparte de forma pareja a lo largo de la jornada.
+  // Ejemplo: 4 h en una jornada de 8 a. m. a 10 p. m. → unos 17 min de trabajo por cada hora de reloj.
+  const largoJornada = ctx.jornada.fin - ctx.jornada.inicio
+  if (largoJornada <= 0) return 0
+  return (ctx.capacidadPorDefectoMin * solapamiento(ctx.jornada, ventana)) / largoJornada
 }
 
 // Minutos de trabajo disponibles entre dos instantes (por ejemplo, desde ahora hasta una entrega)
@@ -123,115 +138,166 @@ export function disponibleEntre(desde: Date, hasta: Date, ctx: ContextoMotor) {
   return total
 }
 
-// ─── Por dónde empezar ─────────────────────────────────────
+// ─── Textos ────────────────────────────────────────────────
 
 // "hoy", "mañana", "en 3 días"
-function cuando(fechaEntrega: Date, ctx: ContextoMotor) {
+export function cuando(fechaEntrega: Date, ctx: ContextoMotor) {
   const dias = diasEntre(enZona(ctx.ahora, ctx.zonaHoraria).fecha, enZona(fechaEntrega, ctx.zonaHoraria).fecha)
   if (dias === 0) return 'hoy'
   if (dias === 1) return 'mañana'
   return `en ${dias} días`
 }
 
+// "hasta tu entrega de hoy", "hasta mañana", "en los próximos 3 días"
+function hastaCuando(fechaEntrega: Date, ctx: ContextoMotor) {
+  const c = cuando(fechaEntrega, ctx)
+  if (c === 'hoy') return 'hasta la entrega de hoy'
+  if (c === 'mañana') return 'hasta mañana'
+  return `en los próximos ${c.replace('en ', '')}`
+}
+
 function fechaLegible(fecha: Date, zonaHoraria: string) {
   return new Intl.DateTimeFormat('es-CO', { timeZone: zonaHoraria, weekday: 'short', day: 'numeric', month: 'short' }).format(fecha)
 }
 
-// "Trabajo A" · "Trabajo A" y "Trabajo B" · "las 3 tareas anteriores"
+// "A" · "A" y "B" · "otras 3 tareas"
 function nombrar(titulos: string[]) {
-  return titulos.length <= 2 ? titulos.map((t) => `"${t}"`).join(' y ') : `las ${titulos.length} tareas anteriores`
+  return titulos.length <= 2 ? titulos.map((t) => `"${t}"`).join(' y ') : `otras ${titulos.length} tareas`
 }
 
-/*
-  Propone un ORDEN para hacer las tareas pendientes y dice qué pasa si se sigue.
+// ─── Por dónde empezar ─────────────────────────────────────
 
-  1. Orden sugerido: primero lo que vence antes (regla "Earliest Deadline First"), medido en tiempo
-     de trabajo: se ordena por el tiempo disponible desde ahora hasta cada entrega.
-     Si dos tareas tienen el mismo tiempo disponible (vencen a la vez, o entre sus entregas no hay
-     tiempo de trabajo), va primero la de mayor prioridad y, si empatan, la más corta.
-     Con una sola persona trabajando, este es el orden que mejor cumple las entregas.
-  2. Se recorre la lista en ese orden sumando el tiempo que piden las tareas.
-     Para cada una: margen = tiempo disponible hasta su entrega − tiempo acumulado (ella y las anteriores).
-     Lo que no alcanza a hacerse antes de una entrega NO se arrastra a las tareas siguientes: esa tarea
-     queda en riesgo para que el usuario decida (mover la fecha, reducirla), y no castiga a las demás.
-  3. Estado según el margen: en riesgo (negativo), margen corto (menos de 2 h) o a tiempo.
-     Las vencidas van arriba y no consumen tiempo futuro. Las tareas sin fecha van al final, por prioridad.
-*/
-export function analizarPrioridades(tareas: TareaMotor[], ctx: ContextoMotor): ResultadoPrioridad[] {
-  // Desempate: mayor prioridad, luego la más corta, luego la que vence antes y por último el título
-  const porEntrega = (a: TareaMotor, b: TareaMotor) =>
+type Candidata = TareaMotor & { fechaEntrega: Date; disponible: number }
+
+// Orden de las entregas; si vencen al mismo tiempo: mayor prioridad, luego la más corta
+function porEntrega(a: TareaMotor, b: TareaMotor) {
+  return (
+    a.fechaEntrega!.getTime() - b.fechaEntrega!.getTime() ||
     VALOR_PRIORIDAD[a.prioridad] - VALOR_PRIORIDAD[b.prioridad] ||
     a.duracionEstimadaMin - b.duracionEstimadaMin ||
-    a.fechaEntrega!.getTime() - b.fechaEntrega!.getTime() ||
     a.titulo.localeCompare(b.titulo)
+  )
+}
 
-  // Una tarea vencida no compite por el tiempo futuro: primero el usuario decide qué hacer con ella
+// La que sale cuando no alcanza el tiempo: la de menor prioridad; si empatan, la más larga
+function menosProtegida(a: TareaMotor, b: TareaMotor) {
+  return (
+    VALOR_PRIORIDAD[b.prioridad] - VALOR_PRIORIDAD[a.prioridad] ||
+    b.duracionEstimadaMin - a.duracionEstimadaMin ||
+    b.fechaEntrega!.getTime() - a.fechaEntrega!.getTime() ||
+    a.titulo.localeCompare(b.titulo)
+  )
+}
+
+export function analizarPrioridades(tareas: TareaMotor[], ctx: ContextoMotor): ResultadoPrioridad[] {
   const vencidas = tareas.filter((t) => t.fechaEntrega && t.fechaEntrega <= ctx.ahora).sort(porEntrega)
-  const futuras = tareas
-    .filter((t) => t.fechaEntrega && t.fechaEntrega > ctx.ahora)
-    .map((t) => ({ t, disponible: disponibleEntre(ctx.ahora, t.fechaEntrega!, ctx) }))
-    .sort((a, b) => a.disponible - b.disponible || porEntrega(a.t, b.t))
   const sinFecha = tareas
     .filter((t) => !t.fechaEntrega)
     .sort((a, b) => VALOR_PRIORIDAD[a.prioridad] - VALOR_PRIORIDAD[b.prioridad] || a.titulo.localeCompare(b.titulo))
+  const futuras: Candidata[] = tareas
+    .filter((t) => t.fechaEntrega && t.fechaEntrega > ctx.ahora)
+    .map((t) => ({ ...t, fechaEntrega: t.fechaEntrega!, disponible: disponibleEntre(ctx.ahora, t.fechaEntrega!, ctx) }))
+    .sort(porEntrega)
 
-  const resultados: Omit<ResultadoPrioridad, 'orden'>[] = []
+  const decisiones: (Omit<ResultadoPrioridad, 'orden'> & { entrega: number })[] = []
 
-  for (const t of vencidas) {
-    resultados.push({
-      tareaId: t.id,
-      estado: 'vencida',
-      disponibleMin: 0,
-      holguraMin: -t.duracionEstimadaMin,
-      razon: `Venció el ${fechaLegible(t.fechaEntrega!, ctx.zonaHoraria)}. Decide si aún la haces, le cambias la fecha o la eliminas.`,
-    })
+  // Las tareas que no caben ni dedicándoles todo el tiempo se apartan primero,
+  // para que no le quiten espacio a las que sí pueden cumplirse
+  const posibles: Candidata[] = []
+  for (const t of futuras) {
+    if (t.duracionEstimadaMin > t.disponible) {
+      decisiones.push({
+        tareaId: t.id,
+        entrega: t.fechaEntrega.getTime(),
+        estado: 'no_alcanza',
+        disponibleMin: Math.round(t.disponible),
+        holguraMin: Math.round(t.disponible - t.duracionEstimadaMin),
+        razon: `Aunque le dediques todo tu tiempo no alcanza: vence ${cuando(t.fechaEntrega, ctx)}, necesita ${formatearMinutos(t.duracionEstimadaMin)} y hasta su entrega solo tienes ${formatearMinutos(t.disponible)} de trabajo. Puedes mover la fecha o reducir lo que harás.`,
+      })
+    } else {
+      posibles.push(t)
+    }
   }
 
+  // Regla 2: se recorren en orden de entrega; si se pasan del tiempo disponible, sale la menos protegida
+  const caben: Candidata[] = []
+  let totalMin = 0
+  for (const t of posibles) {
+    caben.push(t)
+    totalMin += t.duracionEstimadaMin
+    while (totalMin > t.disponible) {
+      const sale = [...caben].sort(menosProtegida)[0]
+      const otras = caben.filter((o) => o !== sale).map((o) => o.titulo)
+      const motivo = caben.every((o) => o === sale || VALOR_PRIORIDAD[o.prioridad] < VALOR_PRIORIDAD[sale.prioridad])
+        ? 'es la de menor prioridad'
+        : 'es la más larga entre las de su misma prioridad'
+      decisiones.push({
+        tareaId: sale.id,
+        entrega: sale.fechaEntrega.getTime(),
+        estado: 'no_alcanza',
+        disponibleMin: Math.round(sale.disponible),
+        holguraMin: null,
+        razon: `No alcanza junto con ${nombrar(otras)}: ${hastaCuando(t.fechaEntrega, ctx)} tienes ${formatearMinutos(t.disponible)} de trabajo y entre todas piden ${formatearMinutos(totalMin)}. Se deja por fuera porque ${motivo}. Puedes mover su fecha o reducirla.`,
+      })
+      caben.splice(caben.indexOf(sale), 1)
+      totalMin -= sale.duracionEstimadaMin
+    }
+  }
+
+  // Regla 3: orden sugerido = orden de las entregas, con el margen que queda al seguirlo
+  const sugeridas: Omit<ResultadoPrioridad, 'orden'>[] = []
   let acumuladoMin = 0
   const anteriores: string[] = []
-  for (const { t, disponible } of futuras) {
-    const entrega = t.fechaEntrega!
+  for (const t of caben) {
     acumuladoMin += t.duracionEstimadaMin
-    const margen = disponible - acumuladoMin
-    const vence = `Vence ${cuando(entrega, ctx)}`
-    const necesita = formatearMinutos(t.duracionEstimadaMin)
+    const margen = t.disponible - acumuladoMin
+    const vence = `Vence ${cuando(t.fechaEntrega, ctx)} y necesita ${formatearMinutos(t.duracionEstimadaMin)}`
+    const ajustada = margen < Math.max(MARGEN_MINIMO_MIN, MARGEN_RELATIVO * t.duracionEstimadaMin)
 
-    let estado: EstadoPrioridad
     let razon: string
-    if (disponible < t.duracionEstimadaMin) {
-      estado = 'en_riesgo'
-      razon = `No alcanza aunque le dediques todo tu tiempo: ${vence.toLowerCase()}, necesita ${necesita} y solo tienes ${formatearMinutos(disponible)} disponibles antes de la entrega.`
-    } else if (margen < 0) {
-      estado = 'en_riesgo'
-      razon = `${vence} y necesita ${necesita}, pero antes vas a hacer ${nombrar(anteriores)}: te faltarían ${formatearMinutos(-margen)}. Puedes mover alguna fecha o dejar para después lo menos importante.`
-    } else if (margen < MARGEN_AJUSTADO_MIN) {
-      estado = 'ajustada'
-      const queda = margen === 0 ? 'cabe justo, sin tiempo de sobra' : `te queda un margen corto: ${formatearMinutos(margen)}`
+    if (!ajustada) {
       razon = anteriores.length
-        ? `${vence} y necesita ${necesita}. Después de ${nombrar(anteriores)} ${queda}.`
-        : `${vence} y necesita ${necesita}. ${queda[0].toUpperCase()}${queda.slice(1)}.`
+        ? `${vence}; después de ${nombrar(anteriores)} aún te sobran ${formatearMinutos(margen)}.`
+        : `${vence}; tienes ${formatearMinutos(t.disponible)} de trabajo hasta entonces.`
     } else {
-      estado = 'a_tiempo'
+      const queda = Math.round(margen) === 0 ? 'cabe justo, sin tiempo de sobra' : `te queda un margen corto: ${formatearMinutos(margen)}`
       razon = anteriores.length
-        ? `${vence} y necesita ${necesita}; después de ${nombrar(anteriores)} aún te sobran ${formatearMinutos(margen)}.`
-        : `${vence} y necesita ${necesita}; tienes ${formatearMinutos(disponible)} disponibles hasta entonces.`
+        ? `${vence}. Después de ${nombrar(anteriores)} ${queda}.`
+        : `${vence}. ${queda[0].toUpperCase()}${queda.slice(1)}.`
     }
 
-    resultados.push({ tareaId: t.id, estado, disponibleMin: disponible, holguraMin: margen, razon })
-    anteriores.push(t.titulo)
-    // Si esta tarea no cabía, solo se cuenta el tiempo que había hasta su entrega
-    acumuladoMin = Math.min(acumuladoMin, disponible)
-  }
-
-  for (const t of sinFecha) {
-    resultados.push({
+    sugeridas.push({
       tareaId: t.id,
-      estado: 'sin_fecha',
-      disponibleMin: null,
-      holguraMin: null,
-      razon: `Sin fecha de entrega · prioridad ${NOMBRE_PRIORIDAD[t.prioridad]}. Puedes hacerla cuando te quede tiempo libre.`,
+      estado: ajustada ? 'ajustada' : 'a_tiempo',
+      disponibleMin: Math.round(t.disponible),
+      holguraMin: Math.round(margen),
+      razon,
     })
+    anteriores.push(t.titulo)
   }
 
-  return resultados.map((r, i) => ({ ...r, orden: i + 1 }))
+  const resultadoVencidas: Omit<ResultadoPrioridad, 'orden'>[] = vencidas.map((t) => ({
+    tareaId: t.id,
+    estado: 'vencida',
+    disponibleMin: 0,
+    holguraMin: null,
+    razon: `Venció el ${fechaLegible(t.fechaEntrega!, ctx.zonaHoraria)}. Decide si aún la haces, le cambias la fecha o la eliminas.`,
+  }))
+
+  const resultadoSinFecha: Omit<ResultadoPrioridad, 'orden'>[] = sinFecha.map((t) => ({
+    tareaId: t.id,
+    estado: 'sin_fecha',
+    disponibleMin: null,
+    holguraMin: null,
+    razon: `Sin fecha de entrega · prioridad ${NOMBRE_PRIORIDAD[t.prioridad]}. Puedes hacerla cuando te quede tiempo libre.`,
+  }))
+
+  const resultadoDecisiones = decisiones.sort((a, b) => a.entrega - b.entrega).map(({ entrega: _e, ...r }) => r)
+
+  return [
+    ...resultadoVencidas.map((r) => ({ ...r, orden: null })),
+    ...resultadoDecisiones.map((r) => ({ ...r, orden: null })),
+    ...sugeridas.map((r, i) => ({ ...r, orden: i + 1 })),
+    ...resultadoSinFecha.map((r) => ({ ...r, orden: null })),
+  ]
 }

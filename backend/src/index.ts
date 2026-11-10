@@ -7,6 +7,7 @@ import rutasTareas from './rutas/tareas.js'
 import rutasPlantillas from './rutas/plantillas.js'
 import rutasDias from './rutas/dias.js'
 import rutasPlanificacion from './rutas/planificacion.js'
+import rutasDiario from './rutas/diario.js'
 
 if (!process.env.JWT_SECRET) {
   throw new Error('Falta JWT_SECRET en el archivo .env')
@@ -28,6 +29,7 @@ app.use('/api/tareas', rutasTareas)
 app.use('/api/plantillas', rutasPlantillas)
 app.use('/api/dias', rutasDias)
 app.use('/api/planificacion', rutasPlanificacion)
+app.use('/api/diario', rutasDiario)
 
 // Manejo de errores: si algo falla, responde con un mensaje claro en vez de detener el servidor
 app.use((error: Error, _req: Request, res: Response, _next: NextFunction) => {

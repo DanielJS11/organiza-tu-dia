@@ -3,6 +3,7 @@ import type { Bloque, DatosBloque, Plantilla } from '../tipos'
 import { usePlantillas } from '../hooks/usePlantillas'
 import { useDia } from '../hooks/useDia'
 import { useTareas } from '../hooks/useTareas'
+import { useAnalisisDia } from '../hooks/useAnalisisDia'
 import { aHora, aMinutos, fechaHoy, formatearDia, sumarDias } from '../utilidades/tiempo'
 import { bloquesDePlantilla, duracionBloque } from '../utilidades/tiposBloque'
 import { claseBotonPrincipal, claseBotonSecundario } from '../utilidades/estilos'
@@ -12,6 +13,8 @@ import LineaDeTiempo from '../componentes/plan/LineaDeTiempo'
 import ResumenBloques from '../componentes/plan/ResumenBloques'
 import TarjetaPlantilla from '../componentes/plan/TarjetaPlantilla'
 import FormularioBloque from '../componentes/plan/FormularioBloque'
+import AvisoCarga from '../componentes/plan/AvisoCarga'
+import DialogoSugerencia from '../componentes/plan/DialogoSugerencia'
 
 // "hoy", "mañana" o "el viernes, 30 de octubre"
 function nombrarDia(fecha: string) {
@@ -38,9 +41,21 @@ function bloqueNuevo(bloques: Bloque[]): DatosBloque {
 export default function Elige() {
   const [fecha, setFecha] = useState(fechaHoy())
   const { plantillas, cargando: cargandoPlantillas, error: errorPlantillas } = usePlantillas()
-  const { dia, cargando: cargandoDia, error: errorDia, aplicarPlantilla, quitarPlan, agregarBloque, editarBloque, eliminarBloque } =
-    useDia(fecha)
+  const {
+    dia,
+    cargando: cargandoDia,
+    error: errorDia,
+    aplicarPlantilla,
+    quitarPlan,
+    agregarBloque,
+    editarBloque,
+    eliminarBloque,
+    aplicarSugerencia,
+    descartarSugerencia,
+  } = useDia(fecha)
   const { tareas } = useTareas()
+  const analisis = useAnalisisDia(fecha, dia, tareas)
+  const [sugiriendo, setSugiriendo] = useState(false)
   const [cambiando, setCambiando] = useState(false)
   const [vistaPrevia, setVistaPrevia] = useState<Plantilla | null>(null)
   const [aplicando, setAplicando] = useState(false)
@@ -50,7 +65,8 @@ export default function Elige() {
 
   const mostrarPlantillas = !dia || cambiando
   const pendientes = tareas.filter((t) => t.estado !== 'COMPLETADA')
-  const idsUbicadas = new Set(dia?.bloques.map((b) => b.tareaId).filter(Boolean))
+  // Una tarea está ubicada si tiene bloque en este día o en otro día desde hoy
+  const idsUbicadas = new Set([...(dia?.bloques.map((b) => b.tareaId) ?? []), ...(analisis?.otrosDias.map((p) => p.tareaId) ?? [])])
   const sinUbicar = pendientes.filter((t) => !idsUbicadas.has(t.id))
 
   function cambiarFecha(nueva: string) {
@@ -120,6 +136,11 @@ export default function Elige() {
               <div className="mt-5">
                 <ResumenBloques bloques={dia.bloques} />
               </div>
+              {analisis?.carga && (
+                <div className="mt-5">
+                  <AvisoCarga carga={analisis.carga} />
+                </div>
+              )}
               <div className="mt-5">
                 <LineaDeTiempo
                   bloques={dia.bloques}
@@ -142,15 +163,22 @@ export default function Elige() {
                 />
               </div>
               <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-                <button onClick={() => setEditandoBloque({ bloque: null })} className={claseBotonSecundario}>
-                  + Agregar bloque
-                </button>
+                <div className="flex flex-wrap gap-2">
+                  <button onClick={() => setEditandoBloque({ bloque: null })} className={claseBotonSecundario}>
+                    + Agregar bloque
+                  </button>
+                                    {fecha >= fechaHoy() && (
+                    <button onClick={() => setSugiriendo(true)} disabled={!analisis} className={claseBotonPrincipal}>
+                      Sugerir distribución
+                    </button>
+                  )}
+                </div>
                 {pendientes.length > 0 && (
                   <p className="text-sm text-slate-500">
-                    {sinUbicar.length === 0
-                      ? 'Todas tus tareas pendientes tienen un bloque.'
-                      : `${sinUbicar.length} de ${pendientes.length} tareas pendientes aún sin bloque. Usa "Editar" en un bloque para asignarlas.`}
-                  </p>
+                                        {sinUbicar.length === 0
+                      ? 'Todas tus tareas pendientes tienen un bloque en algún día.'
+                      : `${sinUbicar.length} de ${pendientes.length} tareas pendientes aún sin bloque en ningún día. Usa "Editar" en un bloque para asignarlas.`}
+                      </p>
                 )}
               </div>
             </section>
@@ -178,12 +206,32 @@ export default function Elige() {
         </>
       )}
 
+      {sugiriendo && analisis && (
+        <DialogoSugerencia
+          propuesta={analisis.propuesta}
+                    avisos={analisis.avisos}
+          onAplicar={async (elegidas) => {
+            await aplicarSugerencia(
+              elegidas.map((p) => ({ bloqueId: p.bloqueId, tareaId: p.tareaId })),
+              analisis.propuesta.length,
+            )
+            setSugiriendo(false)
+          }}
+          onDescartar={async () => {
+            await descartarSugerencia(analisis.propuesta.length)
+            setSugiriendo(false)
+          }}
+          onCerrar={() => setSugiriendo(false)}
+        />
+      )}
+
       {editandoBloque && dia && (
         <Modal titulo={editandoBloque.bloque ? 'Editar bloque' : 'Agregar bloque'} onCerrar={() => setEditandoBloque(null)}>
           <FormularioBloque
             esNuevo={!editandoBloque.bloque}
-                        inicial={editandoBloque.bloque ?? bloqueNuevo(dia.bloques)}
+            inicial={editandoBloque.bloque ?? bloqueNuevo(dia.bloques)}
             minutosEnOtrosBloques={minutosPorTarea(dia.bloques, editandoBloque.bloque?.id)}
+                        otrosDias={analisis?.otrosDias ?? []}
             // Se ofrecen las tareas pendientes; si el bloque ya tenía una completada, también se muestra
             tareas={tareas.filter((t) => t.estado !== 'COMPLETADA' || t.id === editandoBloque.bloque?.tareaId)}
             onGuardar={async (datos) => {

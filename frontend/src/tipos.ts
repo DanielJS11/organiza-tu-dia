@@ -82,14 +82,66 @@ export type BloqueVista = Pick<Bloque, 'tipo' | 'titulo' | 'horaInicio' | 'horaF
 
 
 // Resultado del motor de reglas para "Por dónde empezar"
-export type EstadoPrioridad = 'vencida' | 'en_riesgo' | 'ajustada' | 'a_tiempo' | 'sin_fecha'
+// vencida y no_alcanza → "Necesitan una decisión"; a_tiempo y ajustada → "Orden sugerido"
+export type EstadoPrioridad = 'vencida' | 'no_alcanza' | 'ajustada' | 'a_tiempo' | 'sin_fecha'
 
 export type ResultadoPrioridad = {
   tareaId: string
-  orden: number
+  orden: number | null // posición en el orden sugerido (solo para las tareas que caben)
+
   estado: EstadoPrioridad
   disponibleMin: number | null
   holguraMin: number | null
   razon: string
   tarea: Tarea
 }
+
+// Análisis de un día planificado (sobrecarga y sugerencia de distribución)
+export type CargaDia = {
+  capacidadMin: number
+  necesitanMin: number
+  excesoMin: number
+  tareasUbicadas: number
+  moverIds: string[]
+  mensaje: string | null
+  cubiertasIds: string[]
+  nota: string | null
+}
+
+export type PropuestaBloque = {
+  fecha: string // día del bloque (la sugerencia puede repartir en varios días)
+  bloqueId: string
+  bloque: { titulo: string; horaInicio: string; horaFin: string }
+  tareaId: string
+  tarea: { titulo: string; prioridad: Prioridad; duracionEstimadaMin: number }
+  minutos: number
+  razon: string
+}
+
+
+// Un bloque de otro día (desde hoy) que ya tiene asignada una tarea pendiente
+export type PlanOtroDia = { tareaId: string; fecha: string; minutos: number }
+
+export type AnalisisDia = { carga: CargaDia | null; propuesta: PropuestaBloque[]; avisos: string[]; otrosDias: PlanOtroDia[] }
+
+
+// Reflexiona: diario
+export type EntradaDiario = {
+  id: string
+  fecha: string // "2026-11-09"
+  texto: string
+  actualizadaEn: string
+  etiquetas: string[]
+}
+
+export type ResumenDiaDiario = {
+  plan: {
+    nombre: string
+    bloques: { titulo: string; horaInicio: string; horaFin: string; tarea: { titulo: string; completada: boolean } | null }[]
+  } | null
+  completadas: { id: string; titulo: string; duracionEstimadaMin: number; tiempoRealMin: number | null }[]
+}
+
+export type DiaDiario = { fecha: string; esFuturo: boolean; entrada: EntradaDiario | null; resumen: ResumenDiaDiario }
+
+export type EtiquetaUso = { nombre: string; usos: number }

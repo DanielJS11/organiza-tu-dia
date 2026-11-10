@@ -6,7 +6,7 @@ import Registro from './paginas/Registro'
 import Inicio from './paginas/Inicio'
 import Organiza from './paginas/Organiza'
 import Elige from './paginas/Elige'
-import EnConstruccion from './paginas/EnConstruccion'
+import Reflexiona from './paginas/Reflexiona'
 
 export default function App() {
   return (
@@ -19,7 +19,7 @@ export default function App() {
           <Route path="/" element={<Inicio />} />
           <Route path="/elige" element={<Elige />} />
           <Route path="/organiza" element={<Organiza />} />
-          <Route path="/reflexiona" element={<EnConstruccion titulo="Reflexiona" />} />
+          <Route path="/reflexiona" element={<Reflexiona />} />
         </Route>
       </Route>
 
