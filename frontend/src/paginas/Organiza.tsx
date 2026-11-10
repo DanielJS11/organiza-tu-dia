@@ -111,7 +111,7 @@ export default function Organiza() {
         )}
       </div>
 
-      {error && <p className="mt-6 text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2">{error}</p>}
+      {error && <p role="alert" className="mt-6 text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2">{error}</p>}
 
       {cargando ? (
         <p className="mt-8 text-center text-slate-500">Cargando tareas…</p>
@@ -129,11 +129,14 @@ export default function Organiza() {
           {tareas.length === 0 ? 'Aún no tienes tareas. Crea la primera con "+ Nueva tarea".' : 'No hay tareas con estos filtros.'}
         </p>
       ) : (
-        <ul className="mt-6 space-y-3">
-          {visibles.map((t) => (
-            <TarjetaTarea key={t.id} tarea={t} {...accionesTarea(t)} />
-          ))}
-        </ul>
+                <>
+          <h2 className="sr-only">Tus tareas</h2>
+          <ul className="mt-6 space-y-3">
+            {visibles.map((t) => (
+              <TarjetaTarea key={t.id} tarea={t} {...accionesTarea(t)} />
+            ))}
+          </ul>
+        </>
       )}
 
       {detalle && (

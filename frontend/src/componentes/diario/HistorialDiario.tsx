@@ -26,7 +26,7 @@ export default function HistorialDiario({ entradas, etiquetas, etiqueta, fechaAc
   }, [texto, onBuscar])
 
   const chip = (activo: boolean) =>
-    `rounded-full px-3 py-1 text-sm ${activo ? 'bg-teal-600 text-white' : 'bg-white text-slate-600 shadow-sm hover:bg-slate-50'}`
+    `rounded-full px-3 py-1 text-sm ${activo ? 'bg-teal-700 text-white' : 'bg-white text-slate-600 shadow-sm hover:bg-slate-50'}`
 
   return (
     <section className="mt-10">

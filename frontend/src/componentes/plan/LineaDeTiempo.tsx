@@ -21,19 +21,19 @@ export default function LineaDeTiempo({ bloques, acciones }: Props) {
             <div className="flex flex-1 flex-wrap items-center justify-between gap-x-4 gap-y-1 py-2 pr-3">
               <div className="min-w-0">
                 <p className="font-medium text-slate-800">{b.titulo}</p>
-                <p className="text-sm text-slate-500">
+                <p className="text-sm text-slate-600">
                   {formatearHora(b.horaInicio)} – {formatearHora(b.horaFin)}
                 </p>
                 {b.tarea && (
-                  <p className={`mt-1 text-sm ${b.tarea.estado === 'COMPLETADA' ? 'text-slate-400 line-through' : 'text-slate-700'}`}>
+                  <p className={`mt-1 text-sm ${b.tarea.estado === 'COMPLETADA' ? 'text-slate-500 line-through' : 'text-slate-700'}`}>
                     Tarea: <span className="font-medium">{b.tarea.titulo}</span>
                   </p>
                 )}
               </div>
               <div className="flex flex-wrap items-center gap-2 text-sm">
                 <span className={`font-medium ${estilo.texto}`}>{estilo.nombre}</span>
-                <span className="text-slate-400">·</span>
-                <span className="text-slate-500">{formatearDuracion(duracionBloque(b))}</span>
+                <span className="text-slate-500">·</span>
+                <span className="text-slate-600">{formatearDuracion(duracionBloque(b))}</span>
                 {acciones?.(i)}
               </div>
             </div>

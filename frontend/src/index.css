@@ -10,3 +10,20 @@
   --fc-classic-today: #ccfbf180;
   --fc-classic-border: #e2e8f0;
 }
+
+/* Accesibilidad: un borde visible al navegar con el teclado (Tab) */
+:focus-visible {
+  outline: 2px solid #0f766e;
+  outline-offset: 2px;
+}
+
+/* Si la persona pidió menos movimiento en su sistema, se quitan animaciones y desplazamientos suaves */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

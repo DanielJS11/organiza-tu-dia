@@ -69,7 +69,7 @@ export default function ResumenSemana({ version }: { version: number }) {
         <p className="mt-1 text-sm text-slate-500">Etiquetas más usadas: {e.etiquetas.map((x) => `#${x.nombre} (${x.veces})`).join(', ')}</p>
       )}
 
-      {error && <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>}
+      {error && <p role="alert" className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>}
 
       {resumen && (
         <div className="mt-4">

@@ -1,7 +1,8 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { EntradaDiario } from '../../tipos'
 import { claseBotonPrincipal, claseCampo } from '../../utilidades/estilos'
 import CampoEtiquetas from './CampoEtiquetas'
+import { marcarCambiosPendientes } from '../../utilidades/cambiosPendientes'
 
 const MAX_TEXTO = 5000
 
@@ -25,6 +26,13 @@ export default function EditorEntrada({ entrada, sugerenciasEtiquetas, onGuardar
   const areaTexto = useRef<HTMLTextAreaElement>(null)
 
   const hayCambios = texto.trim() !== (entrada?.texto ?? '') || etiquetas.join() !== (entrada?.etiquetas ?? []).join()
+
+  
+  // Avisa si hay cambios sin guardar (para pedir confirmación antes de salir) y lo limpia al desmontarse
+  useEffect(() => {
+    marcarCambiosPendientes(hayCambios)
+  }, [hayCambios])
+  useEffect(() => () => marcarCambiosPendientes(false), [])
 
   function usarPregunta(pregunta: string) {
     const nuevo = texto.trim() ? `${texto.trimEnd()}\n\n${pregunta}\n` : `${pregunta}\n`
@@ -97,7 +105,7 @@ export default function EditorEntrada({ entrada, sugerenciasEtiquetas, onGuardar
           className={`${claseCampo} resize-y leading-relaxed`}
         />
       </label>
-      <p className="mt-1 text-right text-xs text-slate-400">
+      <p className="mt-1 text-right text-xs text-slate-500">
         {texto.length} / {MAX_TEXTO}
       </p>
 
@@ -112,7 +120,7 @@ export default function EditorEntrada({ entrada, sugerenciasEtiquetas, onGuardar
         />
       </div>
 
-      {error && <p className="mt-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>}
+      {error && <p role="alert" className="mt-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>}
 
       <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
         <div>

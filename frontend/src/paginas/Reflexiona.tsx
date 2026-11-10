@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react'
 import { useDiaDiario, useHistorialDiario } from '../hooks/useDiario'
 import { fechaHoy, formatearDia, sumarDias } from '../utilidades/tiempo'
+import { confirmarSalida } from '../utilidades/cambiosPendientes'
 import SelectorFechaDiario from '../componentes/diario/SelectorFechaDiario'
 import EditorEntrada from '../componentes/diario/EditorEntrada'
 import ResumenDelDia from '../componentes/diario/ResumenDelDia'
@@ -25,9 +26,16 @@ export default function Reflexiona() {
   const { entradas, etiquetas } = useHistorialDiario(etiqueta, buscar, version)
   const alBuscar = useCallback((texto: string) => setBuscar(texto), [])
 
-  function abrir(nueva: string) {
+    // Cambiar de día: si la entrada actual tiene cambios sin guardar, primero se pide confirmación
+  function cambiarDia(nueva: string) {
+    if (nueva === fecha || !confirmarSalida()) return
     setFecha(nueva)
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  function abrir(nueva: string) {
+    cambiarDia(nueva)
+    const sinMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    window.scrollTo({ top: 0, behavior: sinMovimiento ? 'auto' : 'smooth' })
   }
 
   return (
@@ -36,10 +44,10 @@ export default function Reflexiona() {
       <p className="mt-1 text-slate-500">Unos minutos para mirar cómo te fue: lo que aprendes hoy te ayuda a planear mejor mañana.</p>
 
       <div className="mt-6">
-        <SelectorFechaDiario fecha={fecha} onCambiar={setFecha} />
+                <SelectorFechaDiario fecha={fecha} onCambiar={cambiarDia} />
       </div>
 
-      {error && <p className="mt-6 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>}
+      {error && <p role="alert" className="mt-6 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>}
 
       {cargando ? (
         <p className="mt-8 text-center text-slate-500">Cargando…</p>

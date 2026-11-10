@@ -85,8 +85,9 @@ router.post('/login', limiteIntentos, async (req, res) => {
   }
 
   guardarSesion(res, usuario.id)
-  const { hashContrasena: _h, creadoEn: _c, ...publico } = usuario
-  res.json(publico)
+    // Se responde solo con los campos públicos (lista explícita): así ningún campo nuevo
+  // del modelo, como el token de recuperación, se envía por accidente
+  res.json(await prisma.usuario.findUniqueOrThrow({ where: { id: usuario.id }, select: camposPublicos }))
 })
 
 // ─── Recuperar la contraseña ───────────────────────────────

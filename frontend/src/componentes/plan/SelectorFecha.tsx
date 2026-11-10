@@ -20,7 +20,7 @@ export default function SelectorFecha({ fecha, onCambiar }: Props) {
           onClick={() => onCambiar(a.valor)}
           aria-pressed={fecha === a.valor}
           className={`rounded-lg px-3 py-2 text-sm font-medium ${
-            fecha === a.valor ? 'bg-teal-600 text-white' : 'bg-white text-slate-600 shadow-sm hover:bg-slate-50'
+            fecha === a.valor ? 'bg-teal-700 text-white' : 'bg-white text-slate-600 shadow-sm hover:bg-slate-50'
           }`}
         >
           {a.nombre}

@@ -126,7 +126,7 @@ export default function DialogoSugerencia({ propuesta, avisos, onAplicar, onDesc
         )
       })}
 
-      {error && <p className="mt-4 text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2">{error}</p>}
+      {error && <p role="alert" className="mt-4 text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2">{error}</p>}
 
       <div className="mt-6 flex flex-wrap justify-end gap-2">
         <button onClick={() => ejecutar(onDescartar)} disabled={enviando} className={claseBotonSecundario}>

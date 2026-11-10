@@ -37,7 +37,7 @@ export default function TarjetaTarea({ tarea, onCompletar, onEditar, onEliminar 
 
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-2">
-          <h3 className={`font-medium ${completada ? 'text-slate-400 line-through' : 'text-slate-800'}`}>{tarea.titulo}</h3>
+          <h3 className={`font-medium ${completada ? 'text-slate-500 line-through' : 'text-slate-800'}`}>{tarea.titulo}</h3>
           <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${colorPrioridad[tarea.prioridad]}`}>
             {nombresPrioridad[tarea.prioridad]}
           </span>

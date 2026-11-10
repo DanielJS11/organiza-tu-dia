@@ -110,7 +110,7 @@ export default function Elige() {
       </div>
 
       {(errorDia || errorPlantillas) && (
-        <p className="mt-6 text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2">{errorDia || errorPlantillas}</p>
+                    <p role="alert" className="mt-6 text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2">{errorDia || errorPlantillas}</p>
       )}
 
       {cargandoDia || cargandoPlantillas ? (
@@ -148,13 +148,13 @@ export default function Elige() {
                     <span className="flex gap-1">
                       <button
                         onClick={() => setEditandoBloque({ bloque: dia.bloques[i] })}
-                        className="rounded-lg px-2 py-1 text-slate-500 hover:bg-white hover:text-slate-800"
+                        className="rounded-lg px-2 py-1 text-slate-600 hover:bg-white hover:text-slate-800"
                       >
                         Editar
                       </button>
                       <button
                         onClick={() => confirmarEliminarBloque(dia.bloques[i])}
-                        className="rounded-lg px-2 py-1 text-slate-500 hover:bg-white hover:text-red-600"
+                        className="rounded-lg px-2 py-1 text-slate-600 hover:bg-white hover:text-red-600"
                       >
                         Eliminar
                       </button>
@@ -251,7 +251,7 @@ export default function Elige() {
             <LineaDeTiempo bloques={bloquesDePlantilla(vistaPrevia.bloques)} />
           </div>
           {dia && <p className="mt-4 text-sm text-amber-700">Esto reemplazará el plan que ya tienes para {nombrarDia(fecha)}.</p>}
-          {error && <p className="mt-4 text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2">{error}</p>}
+          {error && <p role="alert" className="mt-4 text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2">{error}</p>}
           <div className="mt-6 flex flex-wrap justify-end gap-2">
             <button onClick={() => setVistaPrevia(null)} className={claseBotonSecundario}>
               Volver

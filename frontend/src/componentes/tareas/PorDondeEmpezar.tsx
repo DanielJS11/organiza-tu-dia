@@ -13,7 +13,7 @@ const estilos: Record<EstadoPrioridad, { etiqueta: string; chip: string; marca: 
   vencida: { etiqueta: 'Vencida', chip: 'bg-red-50 text-red-700', marca: 'bg-red-600 text-white' },
   no_alcanza: { etiqueta: 'No alcanza', chip: 'bg-red-50 text-red-700', marca: 'bg-red-600 text-white' },
   ajustada: { etiqueta: 'Margen corto', chip: 'bg-amber-50 text-amber-700', marca: 'bg-amber-500 text-white' },
-  a_tiempo: { etiqueta: 'A tiempo', chip: 'bg-emerald-50 text-emerald-700', marca: 'bg-teal-600 text-white' },
+  a_tiempo: { etiqueta: 'A tiempo', chip: 'bg-emerald-50 text-emerald-700', marca: 'bg-teal-700 text-white' },
   sin_fecha: { etiqueta: 'Sin fecha', chip: 'bg-slate-100 text-slate-600', marca: 'bg-slate-300 text-slate-700' },
 }
 
@@ -58,7 +58,7 @@ function Seccion({ titulo, descripcion, children }: { titulo: string; descripcio
 export default function PorDondeEmpezar({ tareas, onSeleccionar }: Props) {
   const { datos, cargando, error } = usePrioridades(tareas)
 
-  if (error) return <p className="mt-6 text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2">{error}</p>
+  if (error) return <p role="alert" className="mt-6 text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2">{error}</p>
   if (cargando || !datos) return <p className="mt-8 text-center text-slate-500">Calculando…</p>
   if (datos.resultados.length === 0) {
     return (

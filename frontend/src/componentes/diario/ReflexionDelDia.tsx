@@ -50,7 +50,7 @@ export default function ReflexionDelDia({ fecha, hayEntrada, version }: Props) {
         !reflexion && !error && <p className="mt-2 text-sm text-slate-500">La IA lee tu entrada y los datos del día, y te devuelve un aprendizaje y sugerencias para mañana.</p>
       )}
 
-      {error && <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>}
+      {error && <p role="alert" className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>}
 
       {reflexion && (
         <div className="mt-4">
