@@ -35,7 +35,7 @@ export default function ReflexionDelDia({ fecha, hayEntrada, version }: Props) {
           <button
             onClick={pedirReflexion}
             disabled={pidiendo}
-            className="rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white hover:bg-violet-700 disabled:opacity-60"
+            className="rounded-lg bg-noche-600 px-4 py-2 text-sm font-medium text-white hover:bg-noche-700 disabled:opacity-60"
           >
             {textoBoton}
           </button>
@@ -60,10 +60,10 @@ export default function ReflexionDelDia({ fecha, hayEntrada, version }: Props) {
           <RespuestaIA respuesta={reflexion} onCalificada={(estado) => setReflexion({ ...reflexion, estado })}>
             <p>{reflexion.respuesta.observacion}</p>
             <p className="mt-2">
-              <span className="font-medium text-violet-900">Aprendizaje: </span>
+              <span className="font-medium text-noche-900">Aprendizaje: </span>
               {reflexion.respuesta.aprendizaje}
             </p>
-            <p className="mt-2 font-medium text-violet-900">Para mañana:</p>
+            <p className="mt-2 font-medium text-noche-900">Para mañana:</p>
             <ul className="mt-1 list-disc space-y-1 pl-5">
               {reflexion.respuesta.sugerencias.map((s) => (
                 <li key={s}>{s}</li>

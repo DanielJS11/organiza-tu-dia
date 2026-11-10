@@ -24,12 +24,12 @@ export default function RespuestaIA({ respuesta, children, onCalificada }: Props
   }
 
   const boton = (activo: boolean) =>
-    `rounded-lg px-2 py-1 ${activo ? 'bg-violet-100 font-medium text-violet-800' : 'text-slate-600 hover:bg-white hover:text-slate-800'}`
+    `rounded-lg px-2 py-1 ${activo ? 'bg-noche-100 font-medium text-noche-800' : 'text-slate-600 hover:bg-white hover:text-slate-800'}`
 
   return (
-    <div className="rounded-xl bg-violet-50 p-4 text-sm text-slate-700">
+    <div className="rounded-xl bg-noche-50 p-4 text-sm text-slate-700">
       {children}
-      <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-violet-100 pt-2 text-xs text-slate-600">
+      <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-noche-100 pt-2 text-xs text-slate-600">
         <span>Generado por IA ({NOMBRE_PROVEEDOR[respuesta.proveedor]}). Puede equivocarse: tómalo como una sugerencia.</span>
         <span className="flex items-center gap-1">
           ¿Te sirvió?

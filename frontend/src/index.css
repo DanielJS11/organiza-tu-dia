@@ -1,5 +1,74 @@
 @import "tailwindcss";
 
+/* ─────────────────────────────────────────────────────────────
+   Identidad visual: "el arco del día"
+   Cada sección es un momento del día: Elige (mañana, ámbar),
+   Organiza (día, verde pino) y Reflexiona (noche, índigo).
+   Aquí se redefinen los colores de Tailwind que usa toda la app,
+   así el cambio de estilo no obliga a tocar cada componente.
+   ───────────────────────────────────────────────────────────── */
+@theme {
+  --font-sans: 'Bricolage Grotesque Variable', ui-sans-serif, system-ui, sans-serif;
+
+  /* Tinta y papel: grises con un toque verde */
+  --color-slate-50: #f3f6f4;
+  --color-slate-100: #e8eeea;
+  --color-slate-200: #dae2dd;
+  --color-slate-300: #c2cdc7;
+  --color-slate-400: #91a19a;
+  --color-slate-500: #5f706a;
+  --color-slate-600: #4a5a54;
+  --color-slate-700: #34443e;
+  --color-slate-800: #1f302a;
+  --color-slate-900: #14221d;
+
+  /* Verde pino: color principal (Organiza) */
+  --color-teal-50: #edf6f2;
+  --color-teal-100: #d7ebe3;
+  --color-teal-200: #b2d8ca;
+  --color-teal-300: #84bdaa;
+  --color-teal-400: #539e88;
+  --color-teal-500: #2e836e;
+  --color-teal-600: #237462;
+  --color-teal-700: #1c6858;
+  --color-teal-800: #165346;
+  --color-teal-900: #113f36;
+
+  /* Alba: la mañana (Elige) */
+  --color-alba-50: #fdf6e8;
+  --color-alba-100: #f9e9c8;
+  --color-alba-500: #e09a2c;
+  --color-alba-700: #95580a;
+  --color-alba-800: #774509;
+
+  /* Noche: el final del día (Reflexiona e IA) */
+  --color-noche-50: #f1f0fa;
+  --color-noche-100: #e3e1f5;
+  --color-noche-500: #6d68c9;
+  --color-noche-600: #524db3;
+  --color-noche-700: #45419b;
+  --color-noche-800: #37337d;
+  --color-noche-900: #2c2966;
+
+  /* Las tarjetas se separan con una línea fina en vez de una sombra difusa */
+  --shadow-sm: 0 0 0 1px var(--color-slate-200), 0 1px 2px rgb(20 34 29 / 0.04);
+  --shadow-md: 0 0 0 1px var(--color-slate-300), 0 6px 16px -6px rgb(20 34 29 / 0.18);
+}
+
+html {
+  font-optical-sizing: auto;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  background: var(--color-slate-50);
+  color: var(--color-slate-800);
+}
+
+h1,
+h2 {
+  letter-spacing: -0.015em;
+}
 /* Colores del calendario para que combine con el resto de la página */
 .calendario {
   --fc-classic-button: #0d9488;

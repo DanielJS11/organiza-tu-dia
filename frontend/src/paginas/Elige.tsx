@@ -8,6 +8,7 @@ import { aHora, aMinutos, fechaHoy, formatearDia, sumarDias } from '../utilidade
 import { bloquesDePlantilla, duracionBloque } from '../utilidades/tiposBloque'
 import { claseBotonPrincipal, claseBotonSecundario } from '../utilidades/estilos'
 import Modal from '../componentes/Modal'
+import EncabezadoPagina from '../componentes/EncabezadoPagina'
 import SelectorFecha from '../componentes/plan/SelectorFecha'
 import LineaDeTiempo from '../componentes/plan/LineaDeTiempo'
 import ResumenBloques from '../componentes/plan/ResumenBloques'
@@ -102,8 +103,7 @@ export default function Elige() {
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold text-slate-800">Elige</h1>
-      <p className="mt-1 text-slate-500">No tienes que diseñar tu día desde cero: elige la estructura que mejor le queda.</p>
+            <EncabezadoPagina ruta="/elige" descripcion="No tienes que diseñar tu día desde cero: elige la estructura que mejor le queda." />
 
       <div className="mt-6">
         <SelectorFecha fecha={fecha} onCambiar={cambiarFecha} />

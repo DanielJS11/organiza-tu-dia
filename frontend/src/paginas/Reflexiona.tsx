@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react'
 import { useDiaDiario, useHistorialDiario } from '../hooks/useDiario'
 import { fechaHoy, formatearDia, sumarDias } from '../utilidades/tiempo'
 import { confirmarSalida } from '../utilidades/cambiosPendientes'
+import EncabezadoPagina from '../componentes/EncabezadoPagina'
 import SelectorFechaDiario from '../componentes/diario/SelectorFechaDiario'
 import EditorEntrada from '../componentes/diario/EditorEntrada'
 import ResumenDelDia from '../componentes/diario/ResumenDelDia'
@@ -40,9 +41,10 @@ export default function Reflexiona() {
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold text-slate-800">Reflexiona</h1>
-      <p className="mt-1 text-slate-500">Unos minutos para mirar cómo te fue: lo que aprendes hoy te ayuda a planear mejor mañana.</p>
-
+            <EncabezadoPagina
+        ruta="/reflexiona"
+        descripcion="Unos minutos para mirar cómo te fue: lo que aprendes hoy te ayuda a planear mejor mañana."
+      />
       <div className="mt-6">
                 <SelectorFechaDiario fecha={fecha} onCambiar={cambiarDia} />
       </div>

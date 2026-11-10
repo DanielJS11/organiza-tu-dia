@@ -48,7 +48,7 @@ export default function ResumenSemana({ version }: { version: number }) {
           <button
             onClick={pedirResumen}
             disabled={pidiendo}
-            className="rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white hover:bg-violet-700 disabled:opacity-60"
+            className="rounded-lg bg-noche-600 px-4 py-2 text-sm font-medium text-white hover:bg-noche-700 disabled:opacity-60"
           >
             {pidiendo ? 'Pensando…' : resumen ? 'Actualizar resumen con IA' : 'Resumir mi semana con IA'}
           </button>
@@ -77,7 +77,7 @@ export default function ResumenSemana({ version }: { version: number }) {
             <p>{resumen.respuesta.resumen}</p>
             {resumen.respuesta.patrones.length > 0 && (
               <>
-                <p className="mt-2 font-medium text-violet-900">Lo que se repite:</p>
+                <p className="mt-2 font-medium text-noche-900">Lo que se repite:</p>
                 <ul className="mt-1 list-disc space-y-1 pl-5">
                   {resumen.respuesta.patrones.map((p) => (
                     <li key={p}>{p}</li>
@@ -85,7 +85,7 @@ export default function ResumenSemana({ version }: { version: number }) {
                 </ul>
               </>
             )}
-            <p className="mt-2 font-medium text-violet-900">Para la próxima semana:</p>
+            <p className="mt-2 font-medium text-noche-900">Para la próxima semana:</p>
             <ul className="mt-1 list-disc space-y-1 pl-5">
               {resumen.respuesta.recomendaciones.map((r) => (
                 <li key={r}>{r}</li>

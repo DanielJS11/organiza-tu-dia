@@ -4,6 +4,7 @@ import { useTareas } from '../hooks/useTareas'
 import { aFechaLocal, formatearDuracion } from '../utilidades/formato'
 import { claseBotonPrincipal, claseCampoBase } from '../utilidades/estilos'
 import Modal from '../componentes/Modal'
+import EncabezadoPagina from '../componentes/EncabezadoPagina'
 import FormularioTarea from '../componentes/tareas/FormularioTarea'
 import TarjetaTarea from '../componentes/tareas/TarjetaTarea'
 import DialogoCompletar from '../componentes/tareas/DialogoCompletar'
@@ -77,19 +78,19 @@ export default function Organiza() {
 
   return (
     <div>
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold text-slate-800">Organiza</h1>
-          <p className="mt-1 text-slate-500">
-            {pendientes.length === 0
-              ? 'No tienes tareas pendientes.'
-              : `${pendientes.length} ${pendientes.length === 1 ? 'tarea pendiente' : 'tareas pendientes'} · ${formatearDuracion(minutosPendientes)} estimadas`}
-          </p>
-        </div>
-        <button onClick={() => setCreando({})} className={claseBotonPrincipal}>
-          + Nueva tarea
-        </button>
-      </div>
+            <EncabezadoPagina
+        ruta="/organiza"
+        descripcion={
+          pendientes.length === 0
+            ? 'No tienes tareas pendientes.'
+            : `Tienes ${pendientes.length} ${pendientes.length === 1 ? 'tarea pendiente' : 'tareas pendientes'}, unas ${formatearDuracion(minutosPendientes)} de trabajo estimado.`
+        }
+        acciones={
+          <button onClick={() => setCreando({})} className={claseBotonPrincipal}>
+            + Nueva tarea
+          </button>
+        }
+      />
 
       <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
         <Pestanas opciones={vistas} valor={vista} onCambiar={setVista} />

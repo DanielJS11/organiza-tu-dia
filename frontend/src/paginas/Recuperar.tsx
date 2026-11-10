@@ -3,6 +3,7 @@ import { Link } from 'react-router'
 import { api } from '../api'
 import Campo from '../componentes/Campo'
 import FormularioAcceso from '../componentes/FormularioAcceso'
+import MarcoAcceso from '../componentes/MarcoAcceso'
 
 // Paso 1 de la recuperación: pedir el enlace por correo
 export default function Recuperar() {
@@ -33,14 +34,14 @@ export default function Recuperar() {
 
   if (mensaje) {
     return (
-      <main className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-sm p-8 w-full max-w-sm space-y-4" role="status">
-          <h1 className="text-2xl font-semibold text-slate-800">Revisa tu correo</h1>
+            <MarcoAcceso>
+        <div className="space-y-4" role="status">
+          <h1 className="text-3xl font-semibold text-slate-800">Revisa tu correo</h1>
           <p className="text-sm text-slate-600">{mensaje}</p>
           <p className="text-sm text-slate-500">El enlace vence en 30 minutos.</p>
           <p className="text-center text-sm">{volver}</p>
         </div>
-      </main>
+        </MarcoAcceso>
     )
   }
 

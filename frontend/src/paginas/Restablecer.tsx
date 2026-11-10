@@ -3,6 +3,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router'
 import { useSesion } from '../contexto/useSesion'
 import Campo from '../componentes/Campo'
 import FormularioAcceso from '../componentes/FormularioAcceso'
+import MarcoAcceso from '../componentes/MarcoAcceso'
 
 // Paso 2 de la recuperación: elegir la contraseña nueva con el enlace del correo
 export default function Restablecer() {
@@ -40,13 +41,13 @@ export default function Restablecer() {
 
   if (!token) {
     return (
-      <main className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-sm p-8 w-full max-w-sm space-y-4">
+            <MarcoAcceso>
+        <div className="space-y-4">
           <h1 className="text-2xl font-semibold text-slate-800">Enlace incompleto</h1>
           <p className="text-sm text-slate-600">Abre el enlace completo que te llegó al correo, o pide uno nuevo.</p>
           <p className="text-center text-sm">{pie}</p>
         </div>
-      </main>
+      </MarcoAcceso>
     )
   }
 
