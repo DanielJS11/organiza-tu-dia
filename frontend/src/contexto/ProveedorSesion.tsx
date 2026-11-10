@@ -31,14 +31,19 @@ export default function ProveedorSesion({ children }: { children: ReactNode }) {
     setUsuario(datos)
   }
 
+    // Activa o desactiva la IA para este usuario
+  async function cambiarIA(iaActivada: boolean) {
+    setUsuario(await api<Usuario>('/auth/preferencias', { method: 'PATCH', body: JSON.stringify({ iaActivada }) }))
+  }
+
   async function salir() {
     await api('/auth/logout', { method: 'POST' })
     setUsuario(null)
   }
 
   return (
-    <Sesion.Provider value={{ usuario, cargando, ingresar, registrar, salir }}>
-      {children}
+    <Sesion.Provider value={{ usuario, cargando, ingresar, registrar, salir, cambiarIA }}>
+            {children}
     </Sesion.Provider>
   )
 }

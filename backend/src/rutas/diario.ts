@@ -37,7 +37,7 @@ const aRespuesta = (e: EntradaBD) => ({
   etiquetas: e.etiquetas.map((x) => x.nombre),
 })
 
-const buscarEntrada = (usuarioId: string, fecha: string) =>
+export const buscarEntrada = (usuarioId: string, fecha: string) =>
   prisma.entradaDiario.findFirst({ where: { usuarioId, fecha: aFechaBD(fecha) }, include: incluirEtiquetas })
 
 // Borra las etiquetas que ya no usa ninguna entrada
@@ -71,29 +71,24 @@ router.get('/etiquetas', async (req, res) => {
 })
 
 /*
-  Un día del diario: la entrada (si existe) y un resumen de lo que pasó ese día, para
-  ayudar a reflexionar:
+  Resumen de lo que pasó en un día, para ayudar a reflexionar (también lo usa la IA):
   - El plan del día: plantilla y bloques de trabajo con su tarea.
   - Las tareas que se completaron ese día (una tarea completada no se puede editar, así que
     su última actualización es el momento en que se completó), con el tiempo real frente al estimado.
 */
-router.get('/:fecha', validarFecha, async (req, res) => {
-  const fecha = String(req.params.fecha)
-  const usuario = await prisma.usuario.findUniqueOrThrow({ where: { id: req.usuarioId! } })
-
-  const [entrada, dia, completadas] = await Promise.all([
-    buscarEntrada(usuario.id, fecha),
+export async function resumenDelDia(usuarioId: string, zonaHoraria: string, fecha: string) {
+  const [dia, completadas] = await Promise.all([
     prisma.diaPlanificado.findUnique({
-      where: { usuarioId_fecha: { usuarioId: usuario.id, fecha: aFechaBD(fecha) } },
+      where: { usuarioId_fecha: { usuarioId, fecha: aFechaBD(fecha) } },
       include: { plantilla: true, bloques: { include: { tarea: { select: { titulo: true, estado: true } } } } },
     }),
     prisma.tarea.findMany({
       where: {
-        usuarioId: usuario.id,
+        usuarioId,
         estado: 'COMPLETADA',
         actualizadaEn: {
-          gte: instanteEnZona(fecha, 0, usuario.zonaHoraria),
-          lt: instanteEnZona(sumarDiasFecha(fecha, 1), 0, usuario.zonaHoraria),
+          gte: instanteEnZona(fecha, 0, zonaHoraria),
+          lt: instanteEnZona(sumarDiasFecha(fecha, 1), 0, zonaHoraria),
         },
       },
       orderBy: { actualizadaEn: 'asc' },
@@ -104,29 +99,38 @@ router.get('/:fecha', validarFecha, async (req, res) => {
     .filter((b) => TIPOS_DE_TRABAJO.includes(b.tipo) || b.tareaId)
     .sort((a, b) => aMinutos(a.horaInicio) - aMinutos(b.horaInicio))
 
+  return {
+    plan: dia
+      ? {
+          nombre: dia.plantilla?.nombre ?? 'Plan personalizado',
+          bloques: bloquesTrabajo.map((b) => ({
+            titulo: b.titulo,
+            horaInicio: b.horaInicio,
+            horaFin: b.horaFin,
+            tarea: b.tarea ? { titulo: b.tarea.titulo, completada: b.tarea.estado === 'COMPLETADA' } : null,
+          })),
+        }
+      : null,
+    completadas: completadas.map((t) => ({
+      id: t.id,
+      titulo: t.titulo,
+      duracionEstimadaMin: t.duracionEstimadaMin,
+      tiempoRealMin: t.tiempoRealMin,
+    })),
+  }
+}
+
+// Un día del diario: la entrada (si existe) y el resumen de lo que pasó ese día
+router.get('/:fecha', validarFecha, async (req, res) => {
+  const fecha = String(req.params.fecha)
+  const usuario = await prisma.usuario.findUniqueOrThrow({ where: { id: req.usuarioId! } })
+  const [entrada, resumen] = await Promise.all([buscarEntrada(usuario.id, fecha), resumenDelDia(usuario.id, usuario.zonaHoraria, fecha)])
+
   res.json({
     fecha,
     esFuturo: fecha > hoyEnZona(usuario.zonaHoraria),
     entrada: entrada ? aRespuesta(entrada) : null,
-    resumen: {
-      plan: dia
-        ? {
-            nombre: dia.plantilla?.nombre ?? 'Plan personalizado',
-            bloques: bloquesTrabajo.map((b) => ({
-              titulo: b.titulo,
-              horaInicio: b.horaInicio,
-              horaFin: b.horaFin,
-              tarea: b.tarea ? { titulo: b.tarea.titulo, completada: b.tarea.estado === 'COMPLETADA' } : null,
-            })),
-          }
-        : null,
-      completadas: completadas.map((t) => ({
-        id: t.id,
-        titulo: t.titulo,
-        duracionEstimadaMin: t.duracionEstimadaMin,
-        tiempoRealMin: t.tiempoRealMin,
-      })),
-    },
+    resumen,
   })
 })
 

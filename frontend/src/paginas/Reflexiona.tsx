@@ -5,6 +5,8 @@ import SelectorFechaDiario from '../componentes/diario/SelectorFechaDiario'
 import EditorEntrada from '../componentes/diario/EditorEntrada'
 import ResumenDelDia from '../componentes/diario/ResumenDelDia'
 import HistorialDiario from '../componentes/diario/HistorialDiario'
+import ReflexionDelDia from '../componentes/diario/ReflexionDelDia'
+import ResumenSemana from '../componentes/diario/ResumenSemana'
 
 // "hoy", "ayer" o "el lunes, 9 de noviembre"
 function nombrarDia(fecha: string) {
@@ -60,6 +62,7 @@ export default function Reflexiona() {
                     setVersion((v) => v + 1)
                   }}
                 />
+                                <ReflexionDelDia fecha={fecha} hayEntrada={!!dia.entrada} version={version} />
               </div>
               <ResumenDelDia resumen={dia.resumen} />
             </div>
@@ -67,6 +70,7 @@ export default function Reflexiona() {
         )
       )}
 
+      <ResumenSemana version={version} />
       <HistorialDiario
         entradas={entradas}
         etiquetas={etiquetas}

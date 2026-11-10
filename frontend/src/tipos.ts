@@ -145,3 +145,34 @@ export type ResumenDiaDiario = {
 export type DiaDiario = { fecha: string; esFuturo: boolean; entrada: EntradaDiario | null; resumen: ResumenDiaDiario }
 
 export type EtiquetaUso = { nombre: string; usos: number }
+
+
+// IA: respuestas guardadas (reflexión de un día y resumen de la semana)
+export type RespuestaIA<T> = {
+  id: string
+  estado: 'PENDIENTE' | 'ACEPTADA' | 'DESCARTADA' | 'EDITADA'
+  creadaEn: string
+  proveedor: 'gemini' | 'groq'
+  respuesta: T
+}
+
+export type ReflexionIA = RespuestaIA<{ observacion: string; aprendizaje: string; sugerencias: string[] }> & { desactualizada: boolean }
+
+export type EstadisticasSemana = {
+  desde: string
+  hasta: string
+  diasPlanificados: number
+  diasConEntrada: number
+  tareasCompletadas: number
+  conTiempoReal: number
+  minutosEstimados: number
+  minutosReales: number
+  desviacionPct: number | null
+  descripcionPrecision: string
+  etiquetas: { nombre: string; veces: number }[]
+}
+
+export type SemanaIA = {
+  estadisticas: EstadisticasSemana
+  resumen: RespuestaIA<{ resumen: string; patrones: string[]; recomendaciones: string[] }> | null
+}

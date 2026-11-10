@@ -90,6 +90,14 @@ router.post('/logout', (_req, res) => {
   res.json({ mensaje: 'Sesión cerrada' })
 })
 
+// Preferencias del usuario (por ahora: activar o desactivar la IA)
+router.patch('/preferencias', requiereSesion, async (req, res) => {
+  const resultado = z.object({ iaActivada: z.boolean() }).safeParse(req.body)
+  if (!resultado.success) return res.status(400).json({ error: 'Preferencia no válida' })
+  const usuario = await prisma.usuario.update({ where: { id: req.usuarioId }, data: resultado.data, select: camposPublicos })
+  res.json(usuario)
+})
+
 router.get('/yo', requiereSesion, async (req, res) => {
   const usuario = await prisma.usuario.findUnique({
     where: { id: req.usuarioId },
