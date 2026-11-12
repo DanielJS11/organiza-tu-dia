@@ -19,8 +19,9 @@ if (!process.env.JWT_SECRET) {
 const app = express()
 const PUERTO = process.env.PORT || 3000
 
-// En producción el backend está detrás del proxy del hosting: así se ve la IP real de cada usuario
-if (process.env.NODE_ENV === 'production') app.set('trust proxy', 1)
+// En producción hay proxies delante del backend (Vercel y Render): se indica cuántos son para
+// ver la IP real de cada usuario, que usan los límites de intentos. Se ajusta con TRUST_PROXY
+if (process.env.NODE_ENV === 'production') app.set('trust proxy', Number(process.env.TRUST_PROXY ?? 1))
 
 // Cabeceras de seguridad (evitan que la API se cargue en iframes, ocultan "X-Powered-By", etc.)
 app.use(helmet())
@@ -32,8 +33,9 @@ app.use('/api', rateLimit({ windowMs: 15 * 60 * 1000, limit: 1000, message: { er
 
 app.use(cookieParser())
 
-app.get('/api/salud', (_req, res) => {
-  res.json({ estado: 'ok', mensaje: 'El backend está funcionando' })
+// Para comprobar que el backend responde (y qué IP ve: debe ser la tuya, no la de un proxy)
+app.get('/api/salud', (req, res) => {
+  res.json({ estado: 'ok', mensaje: 'El backend está funcionando', ip: req.ip })
 })
 
 app.use('/api/auth', rutasAuth)

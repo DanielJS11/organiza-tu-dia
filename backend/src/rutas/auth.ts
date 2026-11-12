@@ -41,11 +41,13 @@ const camposPublicos = {
   iaActivada: true,
 } as const
 
+// En producción el frontend (Vercel) reenvía /api al backend, así que para el navegador todo
+// es el mismo sitio: la cookie puede ser "lax" (protege contra CSRF) y solo viaja por HTTPS
 function guardarSesion(res: Response, usuarioId: string) {
   res.cookie(NOMBRE_COOKIE, crearToken(usuarioId), {
     httpOnly: true,
     secure: enProduccion,
-    sameSite: enProduccion ? 'none' : 'lax',
+    sameSite: 'lax',
     maxAge: 7 * 24 * 60 * 60 * 1000,
   })
 }
