@@ -4,9 +4,9 @@ import { formatearHora } from '../../utilidades/tiempo'
 
 // Compara el tiempo real con el estimado en palabras
 function comparar(estimado: number, real: number | null) {
-  if (real === null) return `estimada en ${formatearDuracion(estimado)}`
-  if (real === estimado) return `te tomó lo que estimaste (${formatearDuracion(real)})`
-  return `estimaste ${formatearDuracion(estimado)} y te tomó ${formatearDuracion(real)}`
+  if (real === null) return `estimated at ${formatearDuracion(estimado)}`
+  if (real === estimado) return `it took what you estimated (${formatearDuracion(real)})`
+  return `you estimated ${formatearDuracion(estimado)} and it took ${formatearDuracion(real)}`
 }
 
 // Lo que pasó en el día según tus datos: tareas completadas y el plan que tenías
@@ -15,11 +15,11 @@ export default function ResumenDelDia({ resumen }: { resumen: ResumenDiaDiario }
 
   return (
     <section className="rounded-2xl bg-white p-6 shadow-sm">
-      <h2 className="font-semibold text-slate-800">Así fue tu día</h2>
+      <h2 className="font-semibold text-slate-800">How your day went</h2>
 
-      <h3 className="mt-4 text-sm font-medium text-slate-700">Tareas completadas</h3>
+      <h3 className="mt-4 text-sm font-medium text-slate-700">Completed tasks</h3>
       {completadas.length === 0 ? (
-        <p className="mt-1 text-sm text-slate-500">No completaste tareas este día.</p>
+        <p className="mt-1 text-sm text-slate-500">You didn't complete any tasks this day.</p>
       ) : (
         <ul className="mt-2 space-y-2">
           {completadas.map((t) => (
@@ -31,9 +31,9 @@ export default function ResumenDelDia({ resumen }: { resumen: ResumenDiaDiario }
         </ul>
       )}
 
-      <h3 className="mt-5 text-sm font-medium text-slate-700">Tu plan</h3>
+      <h3 className="mt-5 text-sm font-medium text-slate-700">Your plan</h3>
       {!plan ? (
-        <p className="mt-1 text-sm text-slate-500">No tenías un plan para este día.</p>
+        <p className="mt-1 text-sm text-slate-500">You didn't have a plan for this day.</p>
       ) : (
         <>
           <p className="mt-1 text-sm text-slate-600">{plan.nombre}</p>

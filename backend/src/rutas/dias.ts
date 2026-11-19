@@ -10,7 +10,7 @@ router.use(requiereSesion)
 // Revisa que la fecha de la dirección (/api/dias/2026-10-23) sea válida
 export function validarFecha(req: Request, res: Response, next: NextFunction) {
   if (!esFechaValida(String(req.params.fecha))) {
-    return res.status(400).json({ error: 'Fecha no válida' })
+    return res.status(400).json({ error: 'Invalid date' })
   }
   next()
 }
@@ -39,13 +39,13 @@ const esquemaAplicar = z.object({ plantillaId: z.number().int() })
 router.post('/:fecha/aplicar-plantilla', validarFecha, async (req, res) => {
   const resultado = esquemaAplicar.safeParse(req.body)
   if (!resultado.success) {
-    return res.status(400).json({ error: 'Plantilla no válida' })
+    return res.status(400).json({ error: 'Invalid template' })
   }
   const fecha = String(req.params.fecha)
 
   const usuario = await prisma.usuario.findUniqueOrThrow({ where: { id: req.usuarioId } })
   if (fecha < hoyEnZona(usuario.zonaHoraria)) {
-    return res.status(400).json({ error: 'No puedes planificar un día que ya pasó' })
+    return res.status(400).json({ error: 'You can\'t plan a day that has already passed' })
   }
 
   const plantilla = await prisma.plantilla.findUnique({
@@ -53,7 +53,7 @@ router.post('/:fecha/aplicar-plantilla', validarFecha, async (req, res) => {
     include: { bloques: { orderBy: { orden: 'asc' } } },
   })
   if (!plantilla) {
-    return res.status(404).json({ error: 'Plantilla no encontrada' })
+    return res.status(404).json({ error: 'Template not found' })
   }
 
   // Los bloques se COPIAN: editar el día después no cambia la plantilla original
@@ -87,7 +87,7 @@ router.delete('/:fecha', validarFecha, async (req, res) => {
   await prisma.diaPlanificado.deleteMany({
     where: { usuarioId: req.usuarioId, fecha: aFechaBD(String(req.params.fecha)) },
   })
-  res.json({ mensaje: 'Plan eliminado' })
+  res.json({ mensaje: 'Plan deleted' })
 })
 
 // ─── Ajustar los bloques de un día ─────────────────────────
@@ -97,12 +97,12 @@ const HORA = /^([01]\d|2[0-3]):[0-5]\d$/
 const esquemaBloque = z
   .object({
     tipo: z.enum(['ESTUDIO', 'TRABAJO', 'ENFOQUE', 'DESCANSO', 'PERSONAL']),
-    titulo: z.string().trim().min(1, 'Escribe un nombre para el bloque').max(60),
-    horaInicio: z.string().regex(HORA, 'Hora de inicio no válida'),
-    horaFin: z.string().regex(HORA, 'Hora de fin no válida'),
+    titulo: z.string().trim().min(1, 'Enter a name for the block').max(60),
+    horaInicio: z.string().regex(HORA, 'Invalid start time'),
+    horaFin: z.string().regex(HORA, 'Invalid end time'),
     tareaId: z.string().nullable().optional(),
   })
-  .refine((b) => aMinutos(b.horaFin) > aMinutos(b.horaInicio), { message: 'La hora de fin debe ser posterior a la de inicio' })
+  .refine((b) => aMinutos(b.horaFin) > aMinutos(b.horaInicio), { message: 'The end time must be after the start time' })
 
 type DatosBloque = z.infer<typeof esquemaBloque>
 
@@ -110,13 +110,13 @@ type DatosBloque = z.infer<typeof esquemaBloque>
 export async function obtenerDiaEditable(usuarioId: string, fecha: string) {
   const usuario = await prisma.usuario.findUniqueOrThrow({ where: { id: usuarioId } })
   if (fecha < hoyEnZona(usuario.zonaHoraria)) {
-    return { ok: false, estado: 400, error: 'No puedes modificar un día que ya pasó' } as const
+    return { ok: false, estado: 400, error: 'You can\'t change a day that has already passed' } as const
   }
   const dia = await prisma.diaPlanificado.findUnique({
     where: { usuarioId_fecha: { usuarioId, fecha: aFechaBD(fecha) } },
     include: { bloques: true },
   })
-  if (!dia) return { ok: false, estado: 404, error: 'Primero elige una plantilla para este día' } as const
+  if (!dia) return { ok: false, estado: 404, error: 'First choose a template for this day' } as const
   return { ok: true, dia } as const
 }
 
@@ -131,12 +131,12 @@ async function validarBloque(
   const fin = aMinutos(datos.horaFin)
   const cruce = otros.find((b) => inicio < aMinutos(b.horaFin) && fin > aMinutos(b.horaInicio))
   if (cruce) {
-    return `Este horario se cruza con "${cruce.titulo}" (${cruce.horaInicio} – ${cruce.horaFin})`
+    return `This time overlaps with "${cruce.titulo}" (${cruce.horaInicio} – ${cruce.horaFin})`
   }
   if (datos.tareaId && datos.tareaId !== tareaActual) {
     const tarea = await prisma.tarea.findFirst({ where: { id: datos.tareaId, usuarioId } })
-    if (!tarea) return 'Tarea no encontrada'
-    if (tarea.estado === 'COMPLETADA') return 'No puedes asignar una tarea que ya está completada'
+    if (!tarea) return 'Task not found'
+    if (tarea.estado === 'COMPLETADA') return 'You can\'t assign a task that is already completed'
   }
   return null
 }
@@ -169,7 +169,7 @@ router.patch('/:fecha/bloques/:id', validarFecha, async (req, res) => {
   if (!buscado.ok) return res.status(buscado.estado).json({ error: buscado.error })
 
   const bloque = buscado.dia.bloques.find((b) => b.id === req.params.id)
-  if (!bloque) return res.status(404).json({ error: 'Bloque no encontrado' })
+  if (!bloque) return res.status(404).json({ error: 'Block not found' })
 
   const otros = buscado.dia.bloques.filter((b) => b.id !== bloque.id)
   const problema = await validarBloque(resultado.data, req.usuarioId!, otros, bloque.tareaId)
@@ -185,7 +185,7 @@ router.delete('/:fecha/bloques/:id', validarFecha, async (req, res) => {
   if (!buscado.ok) return res.status(buscado.estado).json({ error: buscado.error })
 
   const { count } = await prisma.bloque.deleteMany({ where: { id: String(req.params.id), diaId: buscado.dia.id } })
-  if (count === 0) return res.status(404).json({ error: 'Bloque no encontrado' })
+  if (count === 0) return res.status(404).json({ error: 'Block not found' })
   res.json(await devolverDia(buscado.dia.id))
 })
 

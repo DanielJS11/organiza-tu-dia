@@ -10,18 +10,18 @@ export default function AvisoIA() {
   return (
     <div className="text-xs text-slate-500">
       <button onClick={() => setAbierto(!abierto)} className="underline decoration-dotted hover:text-slate-800" aria-expanded={abierto}>
-        ¿Qué datos usa la IA?
+        What data does the AI use?
       </button>
       {abierto && (
         <div className="mt-2 space-y-2 rounded-lg bg-slate-50 p-3 leading-relaxed">
           <p>
-            Solo cuando tú lo pides, se envían a Google Gemini (o a Groq, si Gemini no responde) el texto de tu entrada, sus etiquetas, las
-            tareas del día con sus tiempos y tu plan. Para el resumen semanal, tus entradas de los últimos 7 días y las estadísticas. Nunca
-            se envían tu nombre ni tu correo.
+            Only when you ask for it, the text of your entry, its tags, the day's tasks with their times and your plan are sent to Google
+            Gemini (or to Groq, if Gemini doesn't respond). For the weekly summary, your entries from the last 7 days and the stats are
+            sent. Your name and email are never sent.
           </p>
-          <p>Ojo: en el plan gratuito, Google puede usar lo que se le envía para mejorar sus productos.</p>
+          <p>Note: on the free plan, Google may use what is sent to improve its products.</p>
           <button onClick={() => cambiarIA(!activada)} className="font-medium text-teal-700 hover:text-teal-900">
-            {activada ? 'Desactivar la IA' : 'Activar la IA'}
+            {activada ? 'Turn off AI' : 'Turn on AI'}
           </button>
         </div>
       )}

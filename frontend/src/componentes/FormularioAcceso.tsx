@@ -28,7 +28,7 @@ export default function FormularioAcceso({ titulo, subtitulo, textoBoton, error,
           disabled={enviando}
           className="w-full rounded-xl bg-teal-700 py-3 font-medium text-white hover:bg-teal-800 disabled:opacity-60"
         >
-          {enviando ? 'Un momento…' : textoBoton}
+          {enviando ? 'One moment…' : textoBoton}
         </button>
         <p className="text-center text-sm text-slate-600">{pie}</p>
       </form>

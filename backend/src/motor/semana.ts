@@ -36,13 +36,13 @@ export function calcularSemana(params: {
   const desviacionPct = minutosEstimados > 0 ? Math.round(((minutosReales - minutosEstimados) / minutosEstimados) * 100) : null
 
   let descripcionPrecision: string
-  if (desviacionPct === null) descripcionPrecision = 'No registraste el tiempo real de tus tareas, así que aún no se puede comparar.'
+  if (desviacionPct === null) descripcionPrecision = 'You didn\'t log the actual time of your tasks, so they can\'t be compared yet.'
   else if (Math.abs(desviacionPct) <= 10)
-    descripcionPrecision = `Tus estimaciones fueron acertadas: estimaste ${formatearMinutos(minutosEstimados)} y te tomó ${formatearMinutos(minutosReales)}.`
+    descripcionPrecision = `Your estimates were accurate: you estimated ${formatearMinutos(minutosEstimados)} and it took ${formatearMinutos(minutosReales)}.`
   else if (desviacionPct > 0)
-    descripcionPrecision = `Tus tareas te tomaron un ${desviacionPct} % más de lo estimado (${formatearMinutos(minutosEstimados)} estimadas, ${formatearMinutos(minutosReales)} reales).`
+    descripcionPrecision = `Your tasks took ${desviacionPct}% longer than estimated (${formatearMinutos(minutosEstimados)} estimated, ${formatearMinutos(minutosReales)} actual).`
   else
-    descripcionPrecision = `Tus tareas te tomaron un ${-desviacionPct} % menos de lo estimado (${formatearMinutos(minutosEstimados)} estimadas, ${formatearMinutos(minutosReales)} reales).`
+    descripcionPrecision = `Your tasks took ${-desviacionPct}% less time than estimated (${formatearMinutos(minutosEstimados)} estimated, ${formatearMinutos(minutosReales)} actual).`
 
   const conteo = new Map<string, number>()
   for (const e of entradas) for (const nombre of e.etiquetas) conteo.set(nombre, (conteo.get(nombre) ?? 0) + 1)

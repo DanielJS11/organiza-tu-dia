@@ -22,7 +22,7 @@ export function marcarCambiosPendientes(pendientes: boolean) {
 // true si se puede continuar: no hay cambios pendientes o el usuario acepta perderlos
 export function confirmarSalida() {
   if (!hayPendientes) return true
-  const continuar = window.confirm('Tienes cambios sin guardar en tu entrada. ¿Quieres salir sin guardarlos?')
+  const continuar = window.confirm('You have unsaved changes in your entry. Leave without saving them?')
   if (continuar) marcarCambiosPendientes(false)
   return continuar
 }

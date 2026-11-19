@@ -16,19 +16,19 @@ const Reflexiona = lazy(() => import('./paginas/Reflexiona'))
 
 export default function App() {
   return (
-    <Suspense fallback={<p className="p-8 text-center text-slate-500">Cargando…</p>}>
+    <Suspense fallback={<p className="p-8 text-center text-slate-500">Loading…</p>}>
       <Routes>
-        <Route path="/ingresar" element={<Ingresar />} />
-        <Route path="/registro" element={<Registro />} />
-        <Route path="/recuperar" element={<Recuperar />} />
-        <Route path="/restablecer" element={<Restablecer />} />
+        <Route path="/login" element={<Ingresar />} />
+        <Route path="/signup" element={<Registro />} />
+        <Route path="/forgot-password" element={<Recuperar />} />
+        <Route path="/reset-password" element={<Restablecer />} />
 
         <Route element={<RutaProtegida />}>
           <Route element={<Plantilla />}>
             <Route path="/" element={<Inicio />} />
-            <Route path="/elige" element={<Elige />} />
-            <Route path="/organiza" element={<Organiza />} />
-            <Route path="/reflexiona" element={<Reflexiona />} />
+            <Route path="/choose" element={<Elige />} />
+            <Route path="/organize" element={<Organiza />} />
+            <Route path="/reflect" element={<Reflexiona />} />
           </Route>
         </Route>
 

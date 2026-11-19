@@ -13,12 +13,13 @@ type Props = {
 }
 
 const prioridades: Prioridad[] = ['ALTA', 'MEDIA', 'BAJA']
+
 export default function FormularioTarea({ tarea, fechaInicial, onGuardar, onCancelar }: Props) {
   const [titulo, setTitulo] = useState(tarea?.titulo ?? '')
   const [descripcion, setDescripcion] = useState(tarea?.descripcion ?? '')
-    const fechaOriginal = tarea?.fechaEntrega ? aFechaLocal(tarea.fechaEntrega) : ''
-    const [fechaEntrega, setFechaEntrega] = useState(fechaOriginal || fechaInicial || '')
-    const [fechaMinima] = useState(() => aFechaLocal(new Date().toISOString())) // momento en que se abrió el formulario
+  const fechaOriginal = tarea?.fechaEntrega ? aFechaLocal(tarea.fechaEntrega) : ''
+  const [fechaEntrega, setFechaEntrega] = useState(fechaOriginal || fechaInicial || '')
+  const [fechaMinima] = useState(() => aFechaLocal(new Date().toISOString())) // momento en que se abrió el formulario
   // Una tarea ya vencida puede editarse sin cambiar su fecha; en cualquier otro caso el calendario bloquea los días pasados
   const vencidaSinCambios = fechaOriginal !== '' && fechaOriginal < fechaMinima && fechaEntrega === fechaOriginal
   const [prioridad, setPrioridad] = useState<Prioridad>(tarea?.prioridad ?? 'MEDIA')
@@ -28,12 +29,12 @@ export default function FormularioTarea({ tarea, fechaInicial, onGuardar, onCanc
   const [enviando, setEnviando] = useState(false)
 
   async function enviar(e: FormEvent<HTMLFormElement>) {
-        e.preventDefault()
+    e.preventDefault()
     setError('')
 
     // No se permite una fecha pasada (si es la misma fecha que ya tenía la tarea, sí se acepta)
     if (fechaEntrega && fechaEntrega !== fechaOriginal && fechaEntrega < aFechaLocal(new Date().toISOString())) {
-      setError('La fecha de entrega no puede estar en el pasado')
+      setError('The due date cannot be in the past')
       return
     }
 
@@ -56,23 +57,23 @@ export default function FormularioTarea({ tarea, fechaInicial, onGuardar, onCanc
 
   return (
     <form onSubmit={enviar} className="space-y-4">
-      <Campo etiqueta="Título" value={titulo} onChange={(e) => setTitulo(e.target.value)} required maxLength={120} autoFocus />
+      <Campo etiqueta="Title" value={titulo} onChange={(e) => setTitulo(e.target.value)} required maxLength={120} autoFocus />
 
       <label className="block">
-        <span className="text-sm font-medium text-slate-700">Descripción (opcional)</span>
+        <span className="text-sm font-medium text-slate-700">Description (optional)</span>
         <textarea value={descripcion} onChange={(e) => setDescripcion(e.target.value)} rows={2} maxLength={1000} className={claseCampo} />
       </label>
 
       <Campo
-        etiqueta="Fecha de entrega (opcional)"
+        etiqueta="Due date (optional)"
         type="datetime-local"
         value={fechaEntrega}
         onChange={(e) => setFechaEntrega(e.target.value)}
-                min={vencidaSinCambios ? undefined : fechaMinima}
+        min={vencidaSinCambios ? undefined : fechaMinima}
       />
 
       <fieldset>
-        <legend className="text-sm font-medium text-slate-700">Prioridad</legend>
+        <legend className="text-sm font-medium text-slate-700">Priority</legend>
         <div className="mt-1 grid grid-cols-3 gap-2">
           {prioridades.map((p) => (
             <button
@@ -90,14 +91,14 @@ export default function FormularioTarea({ tarea, fechaInicial, onGuardar, onCanc
         </div>
       </fieldset>
 
-      <CampoDuracion etiqueta="Duración estimada" minutos={duracion} onChange={setDuracion} />
+      <CampoDuracion etiqueta="Estimated duration" minutos={duracion} onChange={setDuracion} />
 
       {tarea && (
         <label className="block">
-          <span className="text-sm font-medium text-slate-700">Estado</span>
+          <span className="text-sm font-medium text-slate-700">Status</span>
           <select value={estado} onChange={(e) => setEstado(e.target.value as EstadoTarea)} className={claseCampo}>
-            <option value="PENDIENTE">Pendiente</option>
-            <option value="EN_PROGRESO">En progreso</option>
+            <option value="PENDIENTE">Pending</option>
+            <option value="EN_PROGRESO">In progress</option>
           </select>
         </label>
       )}
@@ -106,10 +107,10 @@ export default function FormularioTarea({ tarea, fechaInicial, onGuardar, onCanc
 
       <div className="flex justify-end gap-2 pt-2">
         <button type="button" onClick={onCancelar} className={claseBotonSecundario}>
-          Cancelar
+          Cancel
         </button>
         <button type="submit" disabled={enviando} className={claseBotonPrincipal}>
-          {enviando ? 'Guardando…' : tarea ? 'Guardar cambios' : 'Crear tarea'}
+          {enviando ? 'Saving…' : tarea ? 'Save changes' : 'Create task'}
         </button>
       </div>
     </form>

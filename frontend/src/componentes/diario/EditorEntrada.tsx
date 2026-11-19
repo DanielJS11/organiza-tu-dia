@@ -7,7 +7,7 @@ import { marcarCambiosPendientes } from '../../utilidades/cambiosPendientes'
 const MAX_TEXTO = 5000
 
 // Preguntas guía: ayudan a empezar cuando no se sabe qué escribir
-const PREGUNTAS = ['¿Qué salió bien hoy?', '¿Qué se complicó y por qué?', '¿Qué harías distinto mañana?', '¿Cómo te sentiste con tu plan?']
+const PREGUNTAS = ['What went well today?', 'What was hard, and why?', 'What would you do differently tomorrow?', 'How did you feel about your plan?']
 
 type Props = {
   entrada: EntradaDiario | null
@@ -27,7 +27,6 @@ export default function EditorEntrada({ entrada, sugerenciasEtiquetas, onGuardar
 
   const hayCambios = texto.trim() !== (entrada?.texto ?? '') || etiquetas.join() !== (entrada?.etiquetas ?? []).join()
 
-  
   // Avisa si hay cambios sin guardar (para pedir confirmación antes de salir) y lo limpia al desmontarse
   useEffect(() => {
     marcarCambiosPendientes(hayCambios)
@@ -53,7 +52,7 @@ export default function EditorEntrada({ entrada, sugerenciasEtiquetas, onGuardar
     try {
       await onGuardar(texto.trim(), etiquetas)
       setTexto(texto.trim())
-      setAviso('Entrada guardada')
+      setAviso('Entry saved')
     } catch (err) {
       setError((err as Error).message)
     } finally {
@@ -62,7 +61,7 @@ export default function EditorEntrada({ entrada, sugerenciasEtiquetas, onGuardar
   }
 
   async function eliminar() {
-    if (!window.confirm('¿Eliminar la entrada de este día?')) return
+    if (!window.confirm('Delete this day\'s entry?')) return
     try {
       await onEliminar()
       setTexto('')
@@ -75,7 +74,7 @@ export default function EditorEntrada({ entrada, sugerenciasEtiquetas, onGuardar
 
   return (
     <section className="rounded-2xl bg-white p-6 shadow-sm">
-      <h2 className="font-semibold text-slate-800">{entrada ? 'Tu entrada' : 'Escribe sobre tu día'}</h2>
+      <h2 className="font-semibold text-slate-800">{entrada ? 'Your entry' : 'Write about your day'}</h2>
 
       <div className="mt-3 flex flex-wrap gap-2">
         {PREGUNTAS.map((p) => (
@@ -91,7 +90,7 @@ export default function EditorEntrada({ entrada, sugerenciasEtiquetas, onGuardar
       </div>
 
       <label className="mt-4 block">
-        <span className="sr-only">Texto de la entrada</span>
+        <span className="sr-only">Entry text</span>
         <textarea
           ref={areaTexto}
           value={texto}
@@ -101,7 +100,7 @@ export default function EditorEntrada({ entrada, sugerenciasEtiquetas, onGuardar
           }}
           maxLength={MAX_TEXTO}
           rows={10}
-          placeholder="¿Cómo te fue hoy? Puedes empezar con una de las preguntas de arriba."
+          placeholder="How did today go? You can start with one of the questions above."
           className={`${claseCampo} resize-y leading-relaxed`}
         />
       </label>
@@ -126,14 +125,14 @@ export default function EditorEntrada({ entrada, sugerenciasEtiquetas, onGuardar
         <div>
           {entrada && (
             <button onClick={eliminar} className="rounded-lg px-3 py-2 text-sm text-slate-500 hover:bg-red-50 hover:text-red-600">
-              Eliminar entrada
+              Delete entry
             </button>
           )}
         </div>
         <div className="flex items-center gap-3">
           {aviso && !hayCambios && <span className="text-sm text-emerald-700">{aviso}</span>}
           <button onClick={guardar} disabled={guardando || !texto.trim() || !hayCambios} className={claseBotonPrincipal}>
-            {guardando ? 'Guardando…' : 'Guardar'}
+            {guardando ? 'Saving…' : 'Save'}
           </button>
         </div>
       </div>

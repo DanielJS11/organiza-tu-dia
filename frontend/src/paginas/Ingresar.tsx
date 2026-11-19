@@ -30,19 +30,19 @@ export default function Ingresar() {
 
   return (
     <FormularioAcceso
-      titulo="Bienvenido de nuevo"
-      subtitulo="Ingresa para organizar tu día"
-      textoBoton="Ingresar"
+      titulo="Welcome back"
+      subtitulo="Log in to organize your day"
+      textoBoton="Log in"
       error={error}
       enviando={enviando}
       onSubmit={enviar}
-      pie={<>¿No tienes cuenta? <Link to="/registro" className="text-teal-700 font-medium">Regístrate</Link></>}
+      pie={<>Don't have an account? <Link to="/signup" className="text-teal-700 font-medium">Sign up</Link></>}
     >
-      <Campo etiqueta="Correo" type="email" value={correo} onChange={(e) => setCorreo(e.target.value)} required autoComplete="email" />
-      <Campo etiqueta="Contraseña" type="password" value={contrasena} onChange={(e) => setContrasena(e.target.value)} required autoComplete="current-password" />
-              <p className="-mt-2 text-right text-sm">
-        <Link to="/recuperar" className="text-teal-700 hover:text-teal-900">
-          ¿Olvidaste tu contraseña?
+      <Campo etiqueta="Email" type="email" value={correo} onChange={(e) => setCorreo(e.target.value)} required autoComplete="email" />
+      <Campo etiqueta="Password" type="password" value={contrasena} onChange={(e) => setContrasena(e.target.value)} required autoComplete="current-password" />
+      <p className="-mt-2 text-right text-sm">
+        <Link to="/forgot-password" className="text-teal-700 hover:text-teal-900">
+          Forgot your password?
         </Link>
       </p>
     </FormularioAcceso>

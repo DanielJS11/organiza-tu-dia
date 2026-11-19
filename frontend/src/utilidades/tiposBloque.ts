@@ -3,10 +3,10 @@ import { aHora, aMinutos } from './tiempo'
 
 // Nombre y colores de cada tipo de bloque (se usan en toda la sección Elige)
 export const estiloTipo: Record<TipoBloque, { nombre: string; barra: string; fondo: string; texto: string }> = {
-    ESTUDIO: { nombre: 'Estudio', barra: 'bg-indigo-400', fondo: 'bg-indigo-50', texto: 'text-indigo-700' },
-  TRABAJO: { nombre: 'Trabajo', barra: 'bg-sky-400', fondo: 'bg-sky-50', texto: 'text-sky-800' },
-  ENFOQUE: { nombre: 'Enfoque', barra: 'bg-fuchsia-400', fondo: 'bg-fuchsia-50', texto: 'text-fuchsia-800' },
-  DESCANSO: { nombre: 'Descanso', barra: 'bg-teal-400', fondo: 'bg-teal-50', texto: 'text-teal-800' },
+  ESTUDIO: { nombre: 'Study', barra: 'bg-indigo-400', fondo: 'bg-indigo-50', texto: 'text-indigo-700' },
+  TRABAJO: { nombre: 'Work', barra: 'bg-sky-400', fondo: 'bg-sky-50', texto: 'text-sky-800' },
+  ENFOQUE: { nombre: 'Focus', barra: 'bg-fuchsia-400', fondo: 'bg-fuchsia-50', texto: 'text-fuchsia-800' },
+  DESCANSO: { nombre: 'Break', barra: 'bg-teal-400', fondo: 'bg-teal-50', texto: 'text-teal-800' },
   PERSONAL: { nombre: 'Personal', barra: 'bg-alba-500', fondo: 'bg-alba-50', texto: 'text-alba-800' },
 }
 

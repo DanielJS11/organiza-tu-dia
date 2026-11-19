@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import { seccionDe } from '../utilidades/secciones'
 
-type Props = { ruta: '/elige' | '/organiza' | '/reflexiona'; descripcion: ReactNode; acciones?: ReactNode }
+type Props = { ruta: '/choose' | '/organize' | '/reflect'; descripcion: ReactNode; acciones?: ReactNode }
 
 // Título de cada sección con el icono y el color de su momento del día
 export default function EncabezadoPagina({ ruta, descripcion, acciones }: Props) {

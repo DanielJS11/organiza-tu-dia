@@ -35,7 +35,7 @@ export default function CampoEtiquetas({ etiquetas, sugerencias, onCambiar }: Pr
 
   return (
     <div>
-      <span className="text-sm font-medium text-slate-700">Etiquetas (opcional)</span>
+      <span className="text-sm font-medium text-slate-700">Tags (optional)</span>
       <div className="mt-1 flex flex-wrap items-center gap-2">
         {etiquetas.map((e) => (
           <span key={e} className="flex items-center gap-1 rounded-full bg-teal-50 px-3 py-1 text-sm text-teal-800">
@@ -44,7 +44,7 @@ export default function CampoEtiquetas({ etiquetas, sugerencias, onCambiar }: Pr
               type="button"
               onClick={() => onCambiar(etiquetas.filter((x) => x !== e))}
               className="text-teal-600 hover:text-teal-900"
-              aria-label={`Quitar la etiqueta ${e}`}
+              aria-label={`Remove the tag ${e}`}
             >
               ×
             </button>
@@ -57,9 +57,9 @@ export default function CampoEtiquetas({ etiquetas, sugerencias, onCambiar }: Pr
             onKeyDown={teclear}
             onBlur={() => texto && agregar(texto)}
             list="etiquetas-usadas"
-            placeholder="ej. enfoque, cansancio…"
+            placeholder="e.g. focus, tired…"
             className={`${claseCampoBase} w-48 py-1 text-sm`}
-            aria-label="Agregar etiqueta"
+            aria-label="Add tag"
           />
         )}
         <datalist id="etiquetas-usadas">
@@ -69,7 +69,7 @@ export default function CampoEtiquetas({ etiquetas, sugerencias, onCambiar }: Pr
         </datalist>
       </div>
       <p className="mt-1 text-xs text-slate-500">
-        {lleno ? `Máximo ${MAX_ETIQUETAS} etiquetas.` : 'Escribe y presiona Enter. Te sirven para encontrar días parecidos.'}
+        {lleno ? `Up to ${MAX_ETIQUETAS} tags.` : 'Type and press Enter. They help you find similar days.'}
       </p>
     </div>
   )

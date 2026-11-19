@@ -7,7 +7,7 @@ describe('correo de recuperación', () => {
   it('incluye el enlace y escapa el nombre dentro del HTML', () => {
     const c = correoRecuperacion('<b>Ana</b>', 'http://localhost:5173/restablecer?token=abc', 30)
     expect(c.texto).toContain('http://localhost:5173/restablecer?token=abc')
-    expect(c.texto).toContain('vence en 30 minutos')
+    expect(c.texto).toContain('expires in 30 minutes')
     expect(c.html).toContain('&lt;b&gt;Ana&lt;/b&gt;')
     expect(c.html).not.toContain('<b>Ana</b>')
   })

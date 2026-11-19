@@ -48,10 +48,10 @@ export function instanteEnZona(fecha: string, minutos: number, zonaHoraria: stri
   return new Date(t)
 }
 
-// "A" · "A" y "B" · "A, B y C"
+// "A" · "A" and "B" · "A, B and C"
 function lista(titulos: string[]) {
   const q = titulos.map((t) => `"${t}"`)
-  return q.length <= 1 ? q.join('') : `${q.slice(0, -1).join(', ')} y ${q.at(-1)}`
+  return q.length <= 1 ? q.join('') : `${q.slice(0, -1).join(', ')} and ${q.at(-1)}`
 }
 
 // ─── Tiempo planeado en otros días ─────────────────────────
@@ -122,7 +122,7 @@ export function analizarCargaDia(
   const nota =
     cubiertas.length === 0
       ? null
-      : `${lista(cubiertas.map((t) => t.titulo))} ${cubiertas.length === 1 ? 'ya tiene' : 'ya tienen'} todo su tiempo estimado planeado en días anteriores: ${cubiertas.length === 1 ? 'el bloque que le diste aquí te queda libre' : 'los bloques que les diste aquí te quedan libres'} para otra cosa.`
+      : `${lista(cubiertas.map((t) => t.titulo))} already ${cubiertas.length === 1 ? 'has' : 'have'} all ${cubiertas.length === 1 ? 'its' : 'their'} estimated time planned on earlier days: the ${cubiertas.length === 1 ? 'block' : 'blocks'} you gave ${cubiertas.length === 1 ? 'it' : 'them'} here ${cubiertas.length === 1 ? 'is' : 'are'} free for something else.`
   const base = { tareasUbicadas: ubicadas.length, cubiertasIds: cubiertas.map((t) => t.id), nota }
 
   const necesitanMin = ubicadas.reduce((total, t) => total + pide(t), 0)
@@ -154,7 +154,7 @@ export function analizarCargaDia(
     necesitanMin,
     excesoMin,
     moverIds: mover.map((t) => t.id),
-    mensaje: `Las tareas que ubicaste necesitan ${formatearMinutos(necesitanMin)} y tus bloques de trabajo suman ${formatearMinutos(capacidadMin)}: te pasas por ${formatearMinutos(excesoMin)}. Para que el día sea realista podrías mover ${lista(mover.map((t) => t.titulo))} a otro día. Si solo vas a avanzar una parte, puedes dejarlo así.`,
+    mensaje: `The tasks you placed need ${formatearMinutos(necesitanMin)} and your work blocks add up to ${formatearMinutos(capacidadMin)}: you are over by ${formatearMinutos(excesoMin)}. To make the day realistic you could move ${lista(mover.map((t) => t.titulo))} to another day. If you only plan to make partial progress, you can leave it as it is.`,
     ...base,
   }
 }
@@ -277,9 +277,13 @@ export function proponerVariosDias(params: {
   return { asignaciones, faltaMin }
 }
 
-const formatoDia = new Intl.DateTimeFormat('es-CO', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' })
-// "2026-11-12" → "jueves 12 de noviembre"
-export const nombreDia = (fecha: string) => formatoDia.format(new Date(`${fecha}T12:00:00Z`)).replace(',', '')
+const formatoSemana = new Intl.DateTimeFormat('en-US', { weekday: 'long', timeZone: 'UTC' })
+const formatoFecha = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' })
+// "2026-11-12" → "Thursday (Nov 12)": sin comas, para que se pueda listar varios días separados por comas
+export const nombreDia = (fecha: string) => {
+  const d = new Date(`${fecha}T12:00:00Z`)
+  return `${formatoSemana.format(d)} (${formatoFecha.format(d)})`
+}
 
 /*
   Avisos para las tareas con fecha que, aun con la propuesta, no tienen todo su tiempo
@@ -313,16 +317,16 @@ export function avisosSinTiempo(params: {
       if (sirve && !diasConPlan.has(d)) sinPlan.push(d)
     }
 
-    const inicio = `"${t.titulo}" aún necesita ${formatearMinutos(falta)} antes de su entrega`
+    const inicio = `"${t.titulo}" still needs ${formatearMinutos(falta)} before it is due`
     if (sinPlan.length > 0) {
       const nombres = sinPlan.slice(0, 3).map(nombreDia)
-      const resto = sinPlan.length > 3 ? ` y ${sinPlan.length - 3} ${sinPlan.length - 3 === 1 ? 'día' : 'días'} más` : ''
-      const textoDias = sinPlan.length > 3 || nombres.length === 1 ? nombres.join(', ') + resto : `${nombres.slice(0, -1).join(', ')} y ${nombres.at(-1)}`
+      const resto = sinPlan.length > 3 ? ` and ${sinPlan.length - 3} more ${sinPlan.length - 3 === 1 ? 'day' : 'days'}` : ''
+      const textoDias = sinPlan.length > 3 || nombres.length === 1 ? nombres.join(', ') + resto : `${nombres.slice(0, -1).join(', ')} and ${nombres.at(-1)}`
       avisos.push(
-        `${inicio}. ${sinPlan.length === 1 ? 'Este día no tiene plan' : 'Estos días no tienen plan'}: ${textoDias}. Aplícales una plantilla y vuelve a pedir la sugerencia.`,
+        `${inicio}. ${sinPlan.length === 1 ? 'This day has no plan' : 'These days have no plan'}: ${textoDias}. Apply a template to ${sinPlan.length === 1 ? 'it' : 'them'} and ask for the suggestion again.`,
       )
     } else {
-      avisos.push(`${inicio} y ya no quedan bloques de trabajo libres hasta esa fecha. Puedes agregar bloques, alargar los que tienes o cambiar la fecha.`)
+      avisos.push(`${inicio} and there are no free work blocks left before that date. You can add blocks, make the ones you have longer or change the date.`)
     }
   }
   return avisos

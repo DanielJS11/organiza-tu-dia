@@ -19,13 +19,13 @@ const limiteIA = rateLimit({
   windowMs: 60 * 60 * 1000,
   limit: 20,
   keyGenerator: (req) => req.usuarioId!,
-  message: { error: 'Pediste muchas respuestas a la IA en poco tiempo. Intenta de nuevo en un rato.' },
+  message: { error: 'You asked the AI for too many responses in a short time. Try again in a while.' },
 })
 
 // Si el usuario desactivó la IA, no se le envía nada
 async function requiereIA(req: Request, res: Response, next: NextFunction) {
   const usuario = await prisma.usuario.findUniqueOrThrow({ where: { id: req.usuarioId! } })
-  if (!usuario.iaActivada) return res.status(403).json({ error: 'Tienes la IA desactivada' })
+  if (!usuario.iaActivada) return res.status(403).json({ error: 'You have AI turned off' })
   next()
 }
 
@@ -68,7 +68,7 @@ router.post('/reflexion/:fecha', validarFecha, requiereIA, limiteIA, async (req,
   const fecha = String(req.params.fecha)
   const usuario = await prisma.usuario.findUniqueOrThrow({ where: { id: req.usuarioId! } })
   const entrada = await buscarEntrada(usuario.id, fecha)
-  if (!entrada) return res.status(400).json({ error: 'Primero guarda tu entrada de este día' })
+  if (!entrada) return res.status(400).json({ error: 'Save your entry for this day first' })
   const resumen = await resumenDelDia(usuario.id, usuario.zonaHoraria, fecha)
 
   try {
@@ -129,7 +129,7 @@ router.post('/semana', requiereIA, limiteIA, async (req, res) => {
   const usuario = await prisma.usuario.findUniqueOrThrow({ where: { id: req.usuarioId! } })
   const { hasta, estadisticas, listaEntradas } = await datosSemana(usuario.id, usuario.zonaHoraria)
   if (estadisticas.diasConEntrada === 0 && estadisticas.tareasCompletadas === 0) {
-    return res.status(400).json({ error: 'Aún no hay datos de esta semana: completa tareas o escribe en tu diario y vuelve a intentarlo' })
+    return res.status(400).json({ error: 'There is no data for this week yet: complete tasks or write in your journal and try again' })
   }
 
   try {
@@ -145,12 +145,12 @@ router.post('/semana', requiereIA, limiteIA, async (req, res) => {
 
 router.patch('/sugerencias/:id', async (req, res) => {
   const util = z.boolean().safeParse(req.body?.util)
-  if (!util.success) return res.status(400).json({ error: 'Indica si te sirvió o no' })
+  if (!util.success) return res.status(400).json({ error: 'Say whether it was helpful or not' })
   const { count } = await prisma.sugerencia.updateMany({
     where: { id: String(req.params.id), usuarioId: req.usuarioId!, contenido: { startsWith: '{"tipo":' } },
     data: { estado: util.data ? 'ACEPTADA' : 'DESCARTADA' },
   })
-  if (count === 0) return res.status(404).json({ error: 'Respuesta no encontrada' })
+  if (count === 0) return res.status(404).json({ error: 'Response not found' })
   res.json({ estado: util.data ? 'ACEPTADA' : 'DESCARTADA' })
 })
 

@@ -60,7 +60,7 @@ describe('sobrecarga del día', () => {
     expect(carga.excesoMin).toBe(120)
     expect(carga.moverIds).toEqual(['B'])
     expect(carga.mensaje).toBe(
-      'Las tareas que ubicaste necesitan 6 h y tus bloques de trabajo suman 4 h: te pasas por 2 h. Para que el día sea realista podrías mover "B" a otro día. Si solo vas a avanzar una parte, puedes dejarlo así.',
+      'The tasks you placed need 6 h and your work blocks add up to 4 h: you are over by 2 h. To make the day realistic you could move "B" to another day. If you only plan to make partial progress, you can leave it as it is.',
     )
   })
 
@@ -77,7 +77,7 @@ describe('sobrecarga del día', () => {
     ])
     expect(carga.excesoMin).toBe(180)
     expect(carga.moverIds).toEqual(['sinfecha', 'tarde'])
-    expect(carga.mensaje).toContain('podrías mover "sinfecha" y "tarde" a otro día')
+    expect(carga.mensaje).toContain('you could move "sinfecha" and "tarde" to another day')
   })
 
   it('cuenta una tarea una sola vez aunque esté en varios bloques, e ignora las completadas', () => {
@@ -98,7 +98,7 @@ describe('sobrecarga del día', () => {
   it('con más de dos tareas para mover las lista separadas por comas', () => {
     const dia = [bloque('b1', 'ESTUDIO', '08:00', '08:30', 'x'), bloque('b2', 'PERSONAL', '09:00', '09:30', 'y'), bloque('b3', 'PERSONAL', '10:00', '10:30', 'z')]
     const carga = analizarCargaDia(dia, [tarea('x', { duracionEstimadaMin: 100 }), tarea('y', { duracionEstimadaMin: 100 }), tarea('z', { duracionEstimadaMin: 100 })])
-    expect(carga.mensaje).toContain('"x", "y" y "z"')
+    expect(carga.mensaje).toContain('"x", "y" and "z"')
   })
 })
 
@@ -116,7 +116,7 @@ describe('sobrecarga con tiempo planeado en días anteriores', () => {
     expect(carga.necesitanMin).toBe(0)
     expect(carga.cubiertasIds).toEqual(['Ensayo'])
     expect(carga.nota).toBe(
-      '"Ensayo" ya tiene todo su tiempo estimado planeado en días anteriores: el bloque que le diste aquí te queda libre para otra cosa.',
+      '"Ensayo" already has all its estimated time planned on earlier days: the block you gave it here is free for something else.',
     )
   })
 
@@ -323,7 +323,7 @@ describe('sugerir distribución en varios días', () => {
       zonaHoraria: 'America/Bogota',
     })
     expect(avisos).toEqual([
-      '"Proyecto final" aún necesita 2 h antes de su entrega. Estos días no tienen plan: jueves 12 de noviembre y viernes 13 de noviembre. Aplícales una plantilla y vuelve a pedir la sugerencia.',
+      '"Proyecto final" still needs 2 h before it is due. These days have no plan: Thursday (Nov 12) and Friday (Nov 13). Apply a template to them and ask for the suggestion again.',
     ])
   })
 
@@ -337,7 +337,7 @@ describe('sugerir distribución en varios días', () => {
       jornada: JORNADA,
       zonaHoraria: 'America/Bogota',
     })
-    expect(avisos[0]).toContain('ya no quedan bloques de trabajo libres hasta esa fecha')
+    expect(avisos[0]).toContain('there are no free work blocks left before that date')
   })
 
   it('no cuenta hoy si la jornada terminó ni el día de entrega si vence antes de empezar la jornada', () => {
@@ -350,7 +350,7 @@ describe('sugerir distribución en varios días', () => {
       jornada: JORNADA,
       zonaHoraria: 'America/Bogota',
     })
-    expect(avisos[0]).toContain('Este día no tiene plan: miércoles 11 de noviembre.')
+    expect(avisos[0]).toContain('This day has no plan: Wednesday (Nov 11).')
   })
 
   it('no avisa por tareas sin fecha ni por las que ya tienen todo su tiempo', () => {
@@ -376,6 +376,6 @@ describe('sugerir distribución en varios días', () => {
       jornada: JORNADA,
       zonaHoraria: 'America/Bogota',
     })
-    expect(avisos[0]).toContain('martes 10 de noviembre, miércoles 11 de noviembre, jueves 12 de noviembre y 8 días más')
+    expect(avisos[0]).toContain('Tuesday (Nov 10), Wednesday (Nov 11), Thursday (Nov 12) and 8 more days')
   })
 })

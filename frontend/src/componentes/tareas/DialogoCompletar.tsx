@@ -22,20 +22,20 @@ export default function DialogoCompletar({ tarea, onCompletar, onCerrar }: Props
   }
 
   return (
-    <Modal titulo="¡Tarea completada!" onCerrar={onCerrar}>
+    <Modal titulo="Task completed!" onCerrar={onCerrar}>
       <p className="text-sm text-slate-600">
-        Habías estimado <strong>{formatearDuracion(tarea.duracionEstimadaMin)}</strong> para "{tarea.titulo}". ¿Cuánto tiempo te tomó
-        en realidad? Registrarlo te ayudará a estimar mejor.
+        You estimated <strong>{formatearDuracion(tarea.duracionEstimadaMin)}</strong> for "{tarea.titulo}". How long did it actually
+        take? Logging it will help you estimate better.
       </p>
       <div className="mt-4">
-        <CampoDuracion etiqueta="Tiempo real" minutos={minutos} onChange={setMinutos} />
+        <CampoDuracion etiqueta="Actual time" minutos={minutos} onChange={setMinutos} />
       </div>
       <div className="mt-6 flex flex-wrap justify-end gap-2">
         <button type="button" onClick={() => completar(null)} disabled={enviando} className={claseBotonSecundario}>
-          Completar sin registrar
+          Complete without logging
         </button>
         <button type="button" onClick={() => completar(minutos)} disabled={enviando} className={claseBotonPrincipal}>
-          Guardar tiempo
+          Save time
         </button>
       </div>
     </Modal>

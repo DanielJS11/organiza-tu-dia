@@ -26,7 +26,7 @@ export default function LineaDeTiempo({ bloques, acciones }: Props) {
                 </p>
                 {b.tarea && (
                   <p className={`mt-1 text-sm ${b.tarea.estado === 'COMPLETADA' ? 'text-slate-500 line-through' : 'text-slate-700'}`}>
-                    Tarea: <span className="font-medium">{b.tarea.titulo}</span>
+                    Task: <span className="font-medium">{b.tarea.titulo}</span>
                   </p>
                 )}
               </div>

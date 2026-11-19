@@ -4,7 +4,6 @@ import dayGridPlugin from '@fullcalendar/react/daygrid'
 import timeGridPlugin from '@fullcalendar/react/timegrid'
 import interactionPlugin from '@fullcalendar/react/interaction'
 import classicThemePlugin from '@fullcalendar/react/themes/classic'
-import esLocale from '@fullcalendar/react/locales/es'
 import '@fullcalendar/react/skeleton.css'
 import '@fullcalendar/react/themes/classic/theme.css'
 import '@fullcalendar/react/themes/classic/palette.css'
@@ -45,7 +44,6 @@ export default function CalendarioTareas({ tareas, onSeleccionarTarea, onSelecci
     <div className="calendario rounded-2xl bg-white p-4 shadow-sm">
       <FullCalendar
         plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, classicThemePlugin]}
-        locale={esLocale}
         initialView="dayGridMonth"
         headerToolbar={{ left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek,timeGridDay' }}
         events={eventos}

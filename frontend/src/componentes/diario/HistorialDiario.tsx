@@ -31,21 +31,21 @@ export default function HistorialDiario({ entradas, etiquetas, etiqueta, fechaAc
   return (
     <section className="mt-10">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="font-semibold text-slate-800">Entradas anteriores</h2>
+        <h2 className="font-semibold text-slate-800">Previous entries</h2>
         <input
           type="search"
           value={texto}
           onChange={(e) => setTexto(e.target.value)}
-          placeholder="Buscar en tus entradas…"
+          placeholder="Search your entries…"
           className={`${claseCampoBase} w-full text-sm sm:w-64`}
-          aria-label="Buscar en tus entradas"
+          aria-label="Search your entries"
         />
       </div>
 
       {etiquetas.length > 0 && (
         <div className="mt-3 flex flex-wrap gap-2">
           <button onClick={() => onFiltrar('')} aria-pressed={!etiqueta} className={chip(!etiqueta)}>
-            Todas
+            All
           </button>
           {etiquetas.map((e) => (
             <button key={e.nombre} onClick={() => onFiltrar(e.nombre)} aria-pressed={etiqueta === e.nombre} className={chip(etiqueta === e.nombre)}>
@@ -57,7 +57,7 @@ export default function HistorialDiario({ entradas, etiquetas, etiqueta, fechaAc
 
       {entradas.length === 0 ? (
         <p className="mt-6 text-center text-sm text-slate-500">
-          {etiqueta || texto ? 'Ninguna entrada coincide con tu búsqueda.' : 'Aún no has escrito entradas. La primera puede ser la de hoy.'}
+          {etiqueta || texto ? 'No entries match your search.' : 'You haven\'t written any entries yet. The first one can be today\'s.'}
         </p>
       ) : (
         <ul className="mt-4 space-y-3">

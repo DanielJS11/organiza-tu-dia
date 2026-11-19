@@ -11,10 +11,10 @@ export function aHora(minutos: number) {
   return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`
 }
 
-// "13:30" → "1:30 p. m."
+// "13:30" → "1:30 PM"
 export function formatearHora(hora: string) {
   const [h, m] = hora.split(':').map(Number)
-  return new Intl.DateTimeFormat('es-CO', { hour: 'numeric', minute: '2-digit' }).format(new Date(2000, 0, 1, h, m))
+  return new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: '2-digit' }).format(new Date(2000, 0, 1, h, m))
 }
 
 // Fecha de hoy en formato "2026-10-23", según el reloj del usuario
@@ -33,8 +33,8 @@ export function sumarDias(fecha: string, dias: number) {
   return aFechaTexto(new Date(a, m - 1, d + dias))
 }
 
-// "2026-10-23" → "viernes, 23 de octubre"
+// "2026-10-23" → "Friday, October 23"
 export function formatearDia(fecha: string) {
   const [a, m, d] = fecha.split('-').map(Number)
-  return new Intl.DateTimeFormat('es-CO', { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date(a, m - 1, d))
+  return new Intl.DateTimeFormat('en-US', { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date(a, m - 1, d))
 }

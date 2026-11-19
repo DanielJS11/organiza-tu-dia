@@ -29,13 +29,12 @@ app.use(cors({ origin: process.env.FRONTEND_URL || 'http://localhost:5173', cred
 // Ninguna petición legítima pesa más de 100 KB (una entrada del diario cabe de sobra)
 app.use(express.json({ limit: '100kb' }))
 // Límite general por IP para frenar abusos: 1000 peticiones cada 15 minutos (el uso normal queda muy por debajo)
-app.use('/api', rateLimit({ windowMs: 15 * 60 * 1000, limit: 1000, message: { error: 'Demasiadas peticiones. Espera unos minutos.' } }))
-
+app.use('/api', rateLimit({ windowMs: 15 * 60 * 1000, limit: 1000, message: { error: 'Too many requests. Please wait a few minutes.' } }))
 app.use(cookieParser())
 
 // Para comprobar que el backend responde (y qué IP ve: debe ser la tuya, no la de un proxy)
 app.get('/api/salud', (req, res) => {
-  res.json({ estado: 'ok', mensaje: 'El backend está funcionando', ip: req.ip })
+  res.json({ estado: 'ok', mensaje: 'The backend is running', ip: req.ip })
 })
 
 app.use('/api/auth', rutasAuth)
@@ -49,10 +48,10 @@ app.use('/api/ia', rutasIA)
 // Manejo de errores: si algo falla, responde con un mensaje claro en vez de detener el servidor
 app.use((error: Error & { type?: string }, _req: Request, res: Response, _next: NextFunction) => {
   // Errores del cliente al enviar datos: no son fallas del servidor
-  if (error.type === 'entity.too.large') return res.status(413).json({ error: 'Los datos enviados son demasiado grandes' })
-  if (error.type === 'entity.parse.failed') return res.status(400).json({ error: 'Los datos enviados no tienen un formato válido' })
+  if (error.type === 'entity.too.large') return res.status(413).json({ error: 'The data sent is too large' })
+  if (error.type === 'entity.parse.failed') return res.status(400).json({ error: 'The data sent is not in a valid format' })
   console.error(error)
-  res.status(500).json({ error: 'Ocurrió un error en el servidor' })
+  res.status(500).json({ error: 'Something went wrong on the server' })
 })
 
 app.listen(PUERTO, () => {

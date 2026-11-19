@@ -18,9 +18,9 @@ type Props = {
 
 const tipos = Object.keys(estiloTipo) as TipoBloque[]
 
-// "A" · "A y B" · "A, B y C"
+// "A" · "A and B" · "A, B and C"
 function unir(partes: string[]) {
-  return partes.length <= 1 ? partes.join('') : `${partes.slice(0, -1).join(', ')} y ${partes.at(-1)}`
+  return partes.length <= 1 ? partes.join('') : `${partes.slice(0, -1).join(', ')} and ${partes.at(-1)}`
 }
 
 export default function FormularioBloque({ inicial, tareas, minutosEnOtrosBloques, otrosDias, esNuevo, onGuardar, onCancelar }: Props) {
@@ -43,13 +43,13 @@ export default function FormularioBloque({ inicial, tareas, minutosEnOtrosBloque
   const totalPlaneado = antes + Math.max(duracion, 0)
   const falta = tarea ? tarea.duracionEstimadaMin - totalPlaneado : 0
 
-  // Dónde está ese tiempo: "2 h en otros bloques de este día y 1 h 45 min el martes, 10 de noviembre"
+  // Dónde está ese tiempo: "2 h in other blocks of this day and 1 h 45 min on Tuesday, November 10"
   function dondeEsta(id: string) {
     const partes: string[] = []
-    if (minutosEnOtrosBloques[id]) partes.push(`${formatearDuracion(minutosEnOtrosBloques[id])} en otros bloques de este día`)
+    if (minutosEnOtrosBloques[id]) partes.push(`${formatearDuracion(minutosEnOtrosBloques[id])} in other blocks of this day`)
     const porFecha = new Map<string, number>()
     for (const p of otrosDias.filter((p) => p.tareaId === id)) porFecha.set(p.fecha, (porFecha.get(p.fecha) ?? 0) + p.minutos)
-    for (const [fecha, minutos] of [...porFecha].sort()) partes.push(`${formatearDuracion(minutos)} el ${formatearDia(fecha)}`)
+    for (const [fecha, minutos] of [...porFecha].sort()) partes.push(`${formatearDuracion(minutos)} on ${formatearDia(fecha)}`)
     return unir(partes)
   }
 
@@ -57,7 +57,7 @@ export default function FormularioBloque({ inicial, tareas, minutosEnOtrosBloque
     e.preventDefault()
     setError('')
     if (duracion <= 0) {
-      setError('La hora de fin debe ser posterior a la de inicio')
+      setError('The end time must be after the start time')
       return
     }
     setEnviando(true)
@@ -71,10 +71,10 @@ export default function FormularioBloque({ inicial, tareas, minutosEnOtrosBloque
 
   return (
     <form onSubmit={enviar} className="space-y-4">
-      <Campo etiqueta="Nombre del bloque" value={titulo} onChange={(e) => setTitulo(e.target.value)} required maxLength={60} />
+      <Campo etiqueta="Block name" value={titulo} onChange={(e) => setTitulo(e.target.value)} required maxLength={60} />
 
       <label className="block">
-        <span className="text-sm font-medium text-slate-700">Tipo</span>
+        <span className="text-sm font-medium text-slate-700">Type</span>
         <select value={tipo} onChange={(e) => setTipo(e.target.value as TipoBloque)} className={claseCampo}>
           {tipos.map((t) => (
             <option key={t} value={t}>
@@ -85,18 +85,18 @@ export default function FormularioBloque({ inicial, tareas, minutosEnOtrosBloque
       </label>
 
       <div className="grid grid-cols-2 gap-3">
-        <Campo etiqueta="Empieza" type="time" value={horaInicio} onChange={(e) => setHoraInicio(e.target.value)} required />
-        <Campo etiqueta="Termina" type="time" value={horaFin} onChange={(e) => setHoraFin(e.target.value)} required />
+        <Campo etiqueta="Starts" type="time" value={horaInicio} onChange={(e) => setHoraInicio(e.target.value)} required />
+        <Campo etiqueta="Ends" type="time" value={horaFin} onChange={(e) => setHoraFin(e.target.value)} required />
       </div>
 
       <label className="block">
-        <span className="text-sm font-medium text-slate-700">Tarea para este bloque (opcional)</span>
+        <span className="text-sm font-medium text-slate-700">Task for this block (optional)</span>
         <select value={tareaId} onChange={(e) => setTareaId(e.target.value)} className={claseCampo}>
-          <option value="">Ninguna</option>
+          <option value="">None</option>
           {tareas.map((t) => (
             <option key={t.id} value={t.id}>
               {t.titulo} ({formatearDuracion(t.duracionEstimadaMin)})
-              {planeadoSinEste(t.id) >= t.duracionEstimadaMin ? ' · ya tiene su tiempo planeado' : ''}
+              {planeadoSinEste(t.id) >= t.duracionEstimadaMin ? ' · already has its time planned' : ''}
             </option>
           ))}
         </select>
@@ -105,22 +105,22 @@ export default function FormularioBloque({ inicial, tareas, minutosEnOtrosBloque
       {/* Avisos orientativos (no impiden guardar): comparan la estimación con todo el tiempo ya planeado */}
       {tarea && duracion > 0 && falta > 0 && (
         <p className="text-sm text-amber-700 bg-amber-50 rounded-lg px-3 py-2">
-          Esta tarea está estimada en {formatearDuracion(tarea.duracionEstimadaMin)}.{' '}
+          This task is estimated at {formatearDuracion(tarea.duracionEstimadaMin)}.{' '}
           {antes > 0
-            ? `Ya tiene ${dondeEsta(tarea.id)}; con este bloque tendrá ${formatearDuracion(totalPlaneado)} y le falta ${formatearDuracion(falta)}.`
-            : `Este bloque dura ${formatearDuracion(duracion)}; le falta ${formatearDuracion(falta)}.`}{' '}
-          Puedes alargar el bloque o asignarla también a otro.
+            ? `It already has ${dondeEsta(tarea.id)}; with this block it will have ${formatearDuracion(totalPlaneado)} and still needs ${formatearDuracion(falta)}.`
+            : `This block lasts ${formatearDuracion(duracion)}; it still needs ${formatearDuracion(falta)}.`}{' '}
+          You can make the block longer or also assign it to another one.
         </p>
       )}
       {tarea && duracion > 0 && antes >= tarea.duracionEstimadaMin && (
         <p className="text-sm text-amber-700 bg-amber-50 rounded-lg px-3 py-2">
-          Esta tarea ya tiene su tiempo estimado ({formatearDuracion(tarea.duracionEstimadaMin)}) planeado: {dondeEsta(tarea.id)}. Este bloque
-          sería tiempo extra. Guárdalo si crees que necesitará más, o usa el bloque para otra tarea.
+          This task already has its estimated time ({formatearDuracion(tarea.duracionEstimadaMin)}) planned: {dondeEsta(tarea.id)}. This block
+          would be extra time. Save it if you think it will need more, or use the block for another task.
         </p>
       )}
       {tarea && duracion > 0 && falta <= 0 && antes > 0 && antes < tarea.duracionEstimadaMin && (
         <p className="text-sm text-emerald-700 bg-emerald-50 rounded-lg px-3 py-2">
-          Ya tiene {dondeEsta(tarea.id)}. Con este bloque completa sus {formatearDuracion(tarea.duracionEstimadaMin)} estimadas.
+          It already has {dondeEsta(tarea.id)}. With this block it completes its estimated {formatearDuracion(tarea.duracionEstimadaMin)}.
         </p>
       )}
 
@@ -128,10 +128,10 @@ export default function FormularioBloque({ inicial, tareas, minutosEnOtrosBloque
 
       <div className="flex justify-end gap-2 pt-2">
         <button type="button" onClick={onCancelar} className={claseBotonSecundario}>
-          Cancelar
+          Cancel
         </button>
         <button type="submit" disabled={enviando} className={claseBotonPrincipal}>
-          {enviando ? 'Guardando…' : esNuevo ? 'Agregar bloque' : 'Guardar cambios'}
+          {enviando ? 'Saving…' : esNuevo ? 'Add block' : 'Save changes'}
         </button>
       </div>
     </form>

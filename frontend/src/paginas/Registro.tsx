@@ -31,17 +31,17 @@ export default function Registro() {
 
   return (
     <FormularioAcceso
-      titulo="Crea tu cuenta"
-      subtitulo="Elige, organiza y reflexiona sobre tu tiempo"
-      textoBoton="Crear cuenta"
+      titulo="Create your account"
+      subtitulo="Choose, organize and reflect on your time"
+      textoBoton="Create account"
       error={error}
       enviando={enviando}
       onSubmit={enviar}
-      pie={<>¿Ya tienes cuenta? <Link to="/ingresar" className="text-teal-700 font-medium">Ingresa</Link></>}
+      pie={<>Already have an account? <Link to="/login" className="text-teal-700 font-medium">Log in</Link></>}
     >
-      <Campo etiqueta="Nombre" value={nombre} onChange={(e) => setNombre(e.target.value)} required autoComplete="name" />
-      <Campo etiqueta="Correo" type="email" value={correo} onChange={(e) => setCorreo(e.target.value)} required autoComplete="email" />
-      <Campo etiqueta="Contraseña (mínimo 8 caracteres)" type="password" value={contrasena} onChange={(e) => setContrasena(e.target.value)} required minLength={8} autoComplete="new-password" />
+      <Campo etiqueta="Name" value={nombre} onChange={(e) => setNombre(e.target.value)} required autoComplete="name" />
+      <Campo etiqueta="Email" type="email" value={correo} onChange={(e) => setCorreo(e.target.value)} required autoComplete="email" />
+      <Campo etiqueta="Password (at least 8 characters)" type="password" value={contrasena} onChange={(e) => setContrasena(e.target.value)} required minLength={8} autoComplete="new-password" />
     </FormularioAcceso>
   )
 }

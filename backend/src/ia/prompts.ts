@@ -12,13 +12,13 @@ import type { EstadisticasSemana } from '../motor/semana.js'
 
 const texto = (max: number) => z.string().trim().min(1).max(max)
 
-const SISTEMA_BASE = `Eres el acompañante de "Organiza tu día", una aplicación que ayuda a estudiantes universitarios a organizar su tiempo y a reflexionar sobre cómo les fue.
-Reglas:
-- Escribe en español, tuteando, con un tono cálido, honesto y concreto. Nada de frases genéricas de motivación.
-- Básate SOLO en los datos que te dan. No inventes tareas, horas ni hechos.
-- Las sugerencias deben ser acciones pequeñas y realistas sobre organización, estudio o descanso.
-- No des diagnósticos médicos ni psicológicos. Si la persona expresa un malestar fuerte, sugiere con delicadeza hablar con alguien de confianza o con el servicio de bienestar de su universidad.
-- Responde SOLO con un objeto JSON válido, sin texto antes ni después.`
+const SISTEMA_BASE = `You are the companion of "Organize Your Day", an app that helps university students organize their time and reflect on how things went.
+Rules:
+- Always write in English, addressing the person as "you", with a warm, honest and concrete tone. No generic motivational phrases.
+- Base everything ONLY on the data you are given. Do not invent tasks, hours or facts.
+- Suggestions must be small, realistic actions about organization, studying or rest.
+- Do not give medical or psychological diagnoses. If the person expresses strong distress, gently suggest talking to someone they trust or to their university's wellbeing service.
+- Reply ONLY with a valid JSON object, with no text before or after it.`
 
 // ─── Reflexión de un día ───────────────────────────────────
 
@@ -30,7 +30,7 @@ export const esquemaReflexion = z.object({
 export type RespuestaReflexion = z.infer<typeof esquemaReflexion>
 
 export type DatosReflexion = {
-  dia: string // "lunes 9 de noviembre"
+  dia: string // "Monday (Nov 9)"
   texto: string
   etiquetas: string[]
   completadas: { titulo: string; duracionEstimadaMin: number; tiempoRealMin: number | null }[]
@@ -40,32 +40,32 @@ export type DatosReflexion = {
 export function promptReflexion(d: DatosReflexion) {
   const completadas = d.completadas.length
     ? d.completadas
-        .map((t) => `- ${t.titulo}: estimada en ${formatearMinutos(t.duracionEstimadaMin)}${t.tiempoRealMin !== null ? `, le tomó ${formatearMinutos(t.tiempoRealMin)}` : ''}`)
+        .map((t) => `- ${t.titulo}: estimated at ${formatearMinutos(t.duracionEstimadaMin)}${t.tiempoRealMin !== null ? `, it took ${formatearMinutos(t.tiempoRealMin)}` : ''}`)
         .join('\n')
-    : '- Ninguna'
+    : '- None'
   const plan = d.plan
     ? `${d.plan.nombre}\n${d.plan.bloques
-        .map((b) => `- ${b.horaInicio} ${b.titulo}${b.tarea ? `: ${b.tarea.titulo} (${b.tarea.completada ? 'completada' : 'no completada'})` : ''}`)
+        .map((b) => `- ${b.horaInicio} ${b.titulo}${b.tarea ? `: ${b.tarea.titulo} (${b.tarea.completada ? 'completed' : 'not completed'})` : ''}`)
         .join('\n')}`
-    : 'No tenía plan para ese día.'
+    : 'They had no plan for that day.'
 
   return {
     sistema: `${SISTEMA_BASE}
-Tu tarea: leer la entrada del diario de un día y devolver una reflexión breve con este formato:
-{"observacion": "1 o 2 frases sobre lo más importante del día, conectando lo que escribió con sus datos", "aprendizaje": "1 frase con lo que puede aprender de ese día", "sugerencias": ["1 a 3 acciones concretas para mañana"]}`,
-    mensaje: `Día: ${d.dia}
+Your task: read one day's journal entry and return a short reflection in this format:
+{"observacion": "1 or 2 sentences about the most important thing of the day, connecting what they wrote with their data", "aprendizaje": "1 sentence with what they can learn from that day", "sugerencias": ["1 to 3 concrete actions for tomorrow"]}`,
+    mensaje: `Day: ${d.dia}
 
-Entrada del diario:
+Journal entry:
 """
 ${d.texto}
 """
 
-Etiquetas: ${d.etiquetas.length ? d.etiquetas.join(', ') : 'ninguna'}
+Tags: ${d.etiquetas.length ? d.etiquetas.join(', ') : 'none'}
 
-Tareas completadas ese día:
+Tasks completed that day:
 ${completadas}
 
-Plan del día:
+Plan for the day:
 ${plan}`,
   }
 }
@@ -82,23 +82,23 @@ export type RespuestaSemana = z.infer<typeof esquemaSemana>
 export function promptSemana(e: EstadisticasSemana, entradas: { dia: string; texto: string; etiquetas: string[] }[]) {
   const diario = entradas.length
     ? entradas.map((x) => `[${x.dia}]${x.etiquetas.length ? ` (${x.etiquetas.join(', ')})` : ''}\n${x.texto.slice(0, 1200)}`).join('\n\n')
-    : 'No escribió en el diario esta semana.'
+    : 'They did not write in the journal this week.'
 
   return {
     sistema: `${SISTEMA_BASE}
-Tu tarea: revisar la última semana de la persona y devolver:
-{"resumen": "2 o 3 frases sobre cómo le fue en la semana", "patrones": ["0 a 3 patrones que se repiten en sus datos o en su diario"], "recomendaciones": ["1 a 3 recomendaciones concretas para la próxima semana"]}
-Si los tiempos reales suelen superar lo estimado, recomiéndale estimar con más margen; si casi no planificó días, recomiéndale usar una plantilla.`,
-    mensaje: `Semana: ${e.desde} a ${e.hasta}
+Your task: review the person's last week and return:
+{"resumen": "2 or 3 sentences about how their week went", "patrones": ["0 to 3 patterns that repeat in their data or their journal"], "recomendaciones": ["1 to 3 concrete recommendations for next week"]}
+If the actual times usually exceed the estimates, recommend estimating with more margin; if they barely planned any days, recommend using a template.`,
+    mensaje: `Week: ${e.desde} to ${e.hasta}
 
-Datos calculados por la aplicación:
-- Días con plan: ${e.diasPlanificados} de 7
-- Días con entrada en el diario: ${e.diasConEntrada} de 7
-- Tareas completadas: ${e.tareasCompletadas}
-- Precisión de las estimaciones: ${e.descripcionPrecision}
-- Etiquetas más usadas: ${e.etiquetas.length ? e.etiquetas.map((x) => `${x.nombre} (${x.veces})`).join(', ') : 'ninguna'}
+Data calculated by the app:
+- Days with a plan: ${e.diasPlanificados} of 7
+- Days with a journal entry: ${e.diasConEntrada} of 7
+- Tasks completed: ${e.tareasCompletadas}
+- Accuracy of estimates: ${e.descripcionPrecision}
+- Most used tags: ${e.etiquetas.length ? e.etiquetas.map((x) => `${x.nombre} (${x.veces})`).join(', ') : 'none'}
 
-Diario de la semana:
+Week's journal:
 ${diario}`,
   }
 }

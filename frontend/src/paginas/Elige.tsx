@@ -17,11 +17,11 @@ import FormularioBloque from '../componentes/plan/FormularioBloque'
 import AvisoCarga from '../componentes/plan/AvisoCarga'
 import DialogoSugerencia from '../componentes/plan/DialogoSugerencia'
 
-// "hoy", "mañana" o "el viernes, 30 de octubre"
+// "today", "tomorrow" or "Friday, October 30"
 function nombrarDia(fecha: string) {
-  if (fecha === fechaHoy()) return 'hoy'
-  if (fecha === sumarDias(fechaHoy(), 1)) return 'mañana'
-  return `el ${formatearDia(fecha)}`
+  if (fecha === fechaHoy()) return 'today'
+  if (fecha === sumarDias(fechaHoy(), 1)) return 'tomorrow'
+  return formatearDia(fecha)
 }
 
 // Minutos que cada tarea tiene asignados en el día, sin contar el bloque que se está editando
@@ -90,46 +90,46 @@ export default function Elige() {
   }
 
   async function confirmarEliminarBloque(bloque: Bloque) {
-    if (window.confirm(`¿Eliminar el bloque "${bloque.titulo}"?`)) {
+    if (window.confirm(`Delete the block "${bloque.titulo}"?`)) {
       await eliminarBloque(bloque.id)
     }
   }
 
   async function confirmarQuitar() {
-    if (window.confirm(`¿Quitar el plan de ${nombrarDia(fecha)}?`)) {
+    if (window.confirm(`Remove the plan for ${nombrarDia(fecha)}?`)) {
       await quitarPlan()
     }
   }
 
   return (
     <div>
-            <EncabezadoPagina ruta="/elige" descripcion="No tienes que diseñar tu día desde cero: elige la estructura que mejor le queda." />
+      <EncabezadoPagina ruta="/choose" descripcion="You don't have to design your day from scratch: choose the structure that fits it best." />
 
       <div className="mt-6">
         <SelectorFecha fecha={fecha} onCambiar={cambiarFecha} />
       </div>
 
       {(errorDia || errorPlantillas) && (
-                    <p role="alert" className="mt-6 text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2">{errorDia || errorPlantillas}</p>
+        <p role="alert" className="mt-6 text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2">{errorDia || errorPlantillas}</p>
       )}
 
       {cargandoDia || cargandoPlantillas ? (
-        <p className="mt-8 text-center text-slate-500">Cargando…</p>
+        <p className="mt-8 text-center text-slate-500">Loading…</p>
       ) : (
         <>
           {dia && !cambiando && (
             <section className="mt-6 rounded-2xl bg-white p-6 shadow-sm">
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
-                  <p className="text-sm text-slate-500">Tu plan para {nombrarDia(fecha)}</p>
-                  <h2 className="text-xl font-semibold text-slate-800">{dia.plantilla?.nombre ?? 'Plan personalizado'}</h2>
+                  <p className="text-sm text-slate-500">Your plan for {nombrarDia(fecha)}</p>
+                  <h2 className="text-xl font-semibold text-slate-800">{dia.plantilla?.nombre ?? 'Custom plan'}</h2>
                 </div>
                 <div className="flex gap-2">
                   <button onClick={() => setCambiando(true)} className={claseBotonSecundario}>
-                    Cambiar plantilla
+                    Change template
                   </button>
                   <button onClick={confirmarQuitar} className="rounded-lg px-3 py-2 text-sm text-slate-500 hover:bg-red-50 hover:text-red-600">
-                    Quitar plan
+                    Remove plan
                   </button>
                 </div>
               </div>
@@ -150,13 +150,13 @@ export default function Elige() {
                         onClick={() => setEditandoBloque({ bloque: dia.bloques[i] })}
                         className="rounded-lg px-2 py-1 text-slate-600 hover:bg-white hover:text-slate-800"
                       >
-                        Editar
+                        Edit
                       </button>
                       <button
                         onClick={() => confirmarEliminarBloque(dia.bloques[i])}
                         className="rounded-lg px-2 py-1 text-slate-600 hover:bg-white hover:text-red-600"
                       >
-                        Eliminar
+                        Delete
                       </button>
                     </span>
                   )}
@@ -165,20 +165,20 @@ export default function Elige() {
               <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
                 <div className="flex flex-wrap gap-2">
                   <button onClick={() => setEditandoBloque({ bloque: null })} className={claseBotonSecundario}>
-                    + Agregar bloque
+                    + Add block
                   </button>
-                                    {fecha >= fechaHoy() && (
+                  {fecha >= fechaHoy() && (
                     <button onClick={() => setSugiriendo(true)} disabled={!analisis} className={claseBotonPrincipal}>
-                      Sugerir distribución
+                      Suggest a schedule
                     </button>
                   )}
                 </div>
                 {pendientes.length > 0 && (
                   <p className="text-sm text-slate-500">
-                                        {sinUbicar.length === 0
-                      ? 'Todas tus tareas pendientes tienen un bloque en algún día.'
-                      : `${sinUbicar.length} de ${pendientes.length} tareas pendientes aún sin bloque en ningún día. Usa "Editar" en un bloque para asignarlas.`}
-                      </p>
+                    {sinUbicar.length === 0
+                      ? 'All your pending tasks have a block on some day.'
+                      : `${sinUbicar.length} of ${pendientes.length} pending tasks still have no block on any day. Use "Edit" on a block to assign them.`}
+                  </p>
                 )}
               </div>
             </section>
@@ -188,11 +188,11 @@ export default function Elige() {
             <section className="mt-6">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <h2 className="font-semibold text-slate-800">
-                  {cambiando ? `Elige otra plantilla para ${nombrarDia(fecha)}` : `¿Cómo quieres vivir ${nombrarDia(fecha)}?`}
+                  {cambiando ? `Choose another template for ${nombrarDia(fecha)}` : `How do you want to spend ${nombrarDia(fecha)}?`}
                 </h2>
                 {cambiando && (
                   <button onClick={() => setCambiando(false)} className="text-sm text-slate-500 hover:text-slate-800">
-                    Cancelar
+                    Cancel
                   </button>
                 )}
               </div>
@@ -209,7 +209,7 @@ export default function Elige() {
       {sugiriendo && analisis && (
         <DialogoSugerencia
           propuesta={analisis.propuesta}
-                    avisos={analisis.avisos}
+          avisos={analisis.avisos}
           onAplicar={async (elegidas) => {
             await aplicarSugerencia(
               elegidas.map((p) => ({ bloqueId: p.bloqueId, tareaId: p.tareaId })),
@@ -226,12 +226,12 @@ export default function Elige() {
       )}
 
       {editandoBloque && dia && (
-        <Modal titulo={editandoBloque.bloque ? 'Editar bloque' : 'Agregar bloque'} onCerrar={() => setEditandoBloque(null)}>
+        <Modal titulo={editandoBloque.bloque ? 'Edit block' : 'Add block'} onCerrar={() => setEditandoBloque(null)}>
           <FormularioBloque
             esNuevo={!editandoBloque.bloque}
             inicial={editandoBloque.bloque ?? bloqueNuevo(dia.bloques)}
             minutosEnOtrosBloques={minutosPorTarea(dia.bloques, editandoBloque.bloque?.id)}
-                        otrosDias={analisis?.otrosDias ?? []}
+            otrosDias={analisis?.otrosDias ?? []}
             // Se ofrecen las tareas pendientes; si el bloque ya tenía una completada, también se muestra
             tareas={tareas.filter((t) => t.estado !== 'COMPLETADA' || t.id === editandoBloque.bloque?.tareaId)}
             onGuardar={async (datos) => {
@@ -250,14 +250,14 @@ export default function Elige() {
           <div className="mt-4">
             <LineaDeTiempo bloques={bloquesDePlantilla(vistaPrevia.bloques)} />
           </div>
-          {dia && <p className="mt-4 text-sm text-amber-700">Esto reemplazará el plan que ya tienes para {nombrarDia(fecha)}.</p>}
+          {dia && <p className="mt-4 text-sm text-amber-700">This will replace the plan you already have for {nombrarDia(fecha)}.</p>}
           {error && <p role="alert" className="mt-4 text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2">{error}</p>}
           <div className="mt-6 flex flex-wrap justify-end gap-2">
             <button onClick={() => setVistaPrevia(null)} className={claseBotonSecundario}>
-              Volver
+              Back
             </button>
             <button onClick={() => aplicar(vistaPrevia)} disabled={aplicando} className={claseBotonPrincipal}>
-              {aplicando ? 'Aplicando…' : `Usar para ${nombrarDia(fecha)}`}
+              {aplicando ? 'Applying…' : `Use for ${nombrarDia(fecha)}`}
             </button>
           </div>
         </Modal>

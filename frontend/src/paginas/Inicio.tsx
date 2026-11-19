@@ -3,12 +3,12 @@ import { Link } from 'react-router'
 import { useSesion } from '../contexto/useSesion'
 import { secciones, seccionDelMomento } from '../utilidades/secciones'
 
-const formatoFecha = new Intl.DateTimeFormat('es-CO', { weekday: 'long', day: 'numeric', month: 'long' })
+const formatoFecha = new Intl.DateTimeFormat('en-US', { weekday: 'long', day: 'numeric', month: 'long' })
 
 function saludo(hora: number) {
-  if (hora < 12) return 'Buenos días'
-  if (hora < 19) return 'Buenas tardes'
-  return 'Buenas noches'
+  if (hora < 12) return 'Good morning'
+  if (hora < 19) return 'Good afternoon'
+  return 'Good evening'
 }
 
 export default function Inicio() {
@@ -26,7 +26,7 @@ export default function Inicio() {
         {saludo(ahora.getHours())}, {primerNombre}
       </h1>
       <p className="mt-3 max-w-prose text-lg text-slate-600">
-        Tu día tiene tres momentos. A esta hora es buen momento para {actual.invitacion}.
+        Your day has three moments. Right now is a good time to {actual.invitacion}.
       </p>
 
       <ul className="mt-10 grid gap-4 sm:grid-cols-3">
@@ -42,7 +42,7 @@ export default function Inicio() {
                   <span className={`flex h-11 w-11 items-center justify-center rounded-2xl ${s.tinte}`}>
                     <s.Icono className="h-6 w-6" />
                   </span>
-                  {esAhora && <span className="rounded-full bg-slate-800 px-2.5 py-1 text-xs font-medium text-white">Ahora</span>}
+                  {esAhora && <span className="rounded-full bg-slate-800 px-2.5 py-1 text-xs font-medium text-white">Now</span>}
                 </span>
                 <span className="mt-5 text-sm text-slate-600">{s.momento}</span>
                 <span className="mt-0.5 text-2xl font-semibold text-slate-800">{s.nombre}</span>

@@ -55,7 +55,7 @@ export const MINUTOS_DIA = 24 * 60
 const MARGEN_MINIMO_MIN = 60 // con menos de 1 h de margen la tarea queda "ajustada"…
 const MARGEN_RELATIVO = 0.25 // …o con menos del 25 % de lo que dura (solemos subestimar cuánto tardamos)
 const VALOR_PRIORIDAD: Record<Prioridad, number> = { ALTA: 0, MEDIA: 1, BAJA: 2 }
-const NOMBRE_PRIORIDAD: Record<Prioridad, string> = { ALTA: 'alta', MEDIA: 'media', BAJA: 'baja' }
+const NOMBRE_PRIORIDAD: Record<Prioridad, string> = { ALTA: 'high', MEDIA: 'medium', BAJA: 'low' }
 
 // ─── Utilidades de tiempo ──────────────────────────────────
 
@@ -140,29 +140,29 @@ export function disponibleEntre(desde: Date, hasta: Date, ctx: ContextoMotor) {
 
 // ─── Textos ────────────────────────────────────────────────
 
-// "hoy", "mañana", "en 3 días"
+// "today", "tomorrow", "in 3 days"
 export function cuando(fechaEntrega: Date, ctx: ContextoMotor) {
   const dias = diasEntre(enZona(ctx.ahora, ctx.zonaHoraria).fecha, enZona(fechaEntrega, ctx.zonaHoraria).fecha)
-  if (dias === 0) return 'hoy'
-  if (dias === 1) return 'mañana'
-  return `en ${dias} días`
+  if (dias === 0) return 'today'
+  if (dias === 1) return 'tomorrow'
+  return `in ${dias} days`
 }
 
-// "hasta tu entrega de hoy", "hasta mañana", "en los próximos 3 días"
+// "until today's deadline", "until tomorrow", "over the next 3 days"
 function hastaCuando(fechaEntrega: Date, ctx: ContextoMotor) {
   const c = cuando(fechaEntrega, ctx)
-  if (c === 'hoy') return 'hasta la entrega de hoy'
-  if (c === 'mañana') return 'hasta mañana'
-  return `en los próximos ${c.replace('en ', '')}`
+  if (c === 'today') return "until today's deadline"
+  if (c === 'tomorrow') return 'until tomorrow'
+  return `over the next ${c.replace('in ', '')}`
 }
 
 function fechaLegible(fecha: Date, zonaHoraria: string) {
-  return new Intl.DateTimeFormat('es-CO', { timeZone: zonaHoraria, weekday: 'short', day: 'numeric', month: 'short' }).format(fecha)
+  return new Intl.DateTimeFormat('en-US', { timeZone: zonaHoraria, weekday: 'short', day: 'numeric', month: 'short' }).format(fecha)
 }
 
-// "A" · "A" y "B" · "otras 3 tareas"
+// "A" · "A" and "B" · "3 other tasks"
 function nombrar(titulos: string[]) {
-  return titulos.length <= 2 ? titulos.map((t) => `"${t}"`).join(' y ') : `otras ${titulos.length} tareas`
+  return titulos.length <= 2 ? titulos.map((t) => `"${t}"`).join(' and ') : `${titulos.length} other tasks`
 }
 
 // ─── Por dónde empezar ─────────────────────────────────────
@@ -212,7 +212,7 @@ export function analizarPrioridades(tareas: TareaMotor[], ctx: ContextoMotor): R
         estado: 'no_alcanza',
         disponibleMin: Math.round(t.disponible),
         holguraMin: Math.round(t.disponible - t.duracionEstimadaMin),
-        razon: `Aunque le dediques todo tu tiempo no alcanza: vence ${cuando(t.fechaEntrega, ctx)}, necesita ${formatearMinutos(t.duracionEstimadaMin)} y hasta su entrega solo tienes ${formatearMinutos(t.disponible)} de trabajo. Puedes mover la fecha o reducir lo que harás.`,
+        razon: `Even if you give it all your time, there isn't enough: it's due ${cuando(t.fechaEntrega, ctx)}, it needs ${formatearMinutos(t.duracionEstimadaMin)} and until then you only have ${formatearMinutos(t.disponible)} of work. You can move the date or reduce what you will do.`,
       })
     } else {
       posibles.push(t)
@@ -229,15 +229,15 @@ export function analizarPrioridades(tareas: TareaMotor[], ctx: ContextoMotor): R
       const sale = [...caben].sort(menosProtegida)[0]
       const otras = caben.filter((o) => o !== sale).map((o) => o.titulo)
       const motivo = caben.every((o) => o === sale || VALOR_PRIORIDAD[o.prioridad] < VALOR_PRIORIDAD[sale.prioridad])
-        ? 'es la de menor prioridad'
-        : 'es la más larga entre las de su misma prioridad'
+        ? 'it has the lowest priority'
+        : 'it is the longest among those with the same priority'
       decisiones.push({
         tareaId: sale.id,
         entrega: sale.fechaEntrega.getTime(),
         estado: 'no_alcanza',
         disponibleMin: Math.round(sale.disponible),
         holguraMin: null,
-        razon: `No alcanza junto con ${nombrar(otras)}: ${hastaCuando(t.fechaEntrega, ctx)} tienes ${formatearMinutos(t.disponible)} de trabajo y entre todas piden ${formatearMinutos(totalMin)}. Se deja por fuera porque ${motivo}. Puedes mover su fecha o reducirla.`,
+        razon: `There isn't enough time for it together with ${nombrar(otras)}: ${hastaCuando(t.fechaEntrega, ctx)} you have ${formatearMinutos(t.disponible)} of work and together they need ${formatearMinutos(totalMin)}. It is left out because ${motivo}. You can move its date or reduce it.`,
       })
       caben.splice(caben.indexOf(sale), 1)
       totalMin -= sale.duracionEstimadaMin
@@ -251,18 +251,18 @@ export function analizarPrioridades(tareas: TareaMotor[], ctx: ContextoMotor): R
   for (const t of caben) {
     acumuladoMin += t.duracionEstimadaMin
     const margen = t.disponible - acumuladoMin
-    const vence = `Vence ${cuando(t.fechaEntrega, ctx)} y necesita ${formatearMinutos(t.duracionEstimadaMin)}`
+    const vence = `Due ${cuando(t.fechaEntrega, ctx)} and needs ${formatearMinutos(t.duracionEstimadaMin)}`
     const ajustada = margen < Math.max(MARGEN_MINIMO_MIN, MARGEN_RELATIVO * t.duracionEstimadaMin)
 
     let razon: string
     if (!ajustada) {
       razon = anteriores.length
-        ? `${vence}; después de ${nombrar(anteriores)} aún te sobran ${formatearMinutos(margen)}.`
-        : `${vence}; tienes ${formatearMinutos(t.disponible)} de trabajo hasta entonces.`
+        ? `${vence}; after ${nombrar(anteriores)} you still have ${formatearMinutos(margen)} to spare.`
+        : `${vence}; you have ${formatearMinutos(t.disponible)} of work until then.`
     } else {
-      const queda = Math.round(margen) === 0 ? 'cabe justo, sin tiempo de sobra' : `te queda un margen corto: ${formatearMinutos(margen)}`
+      const queda = Math.round(margen) === 0 ? 'it just fits, with no time to spare' : `you have a tight margin: ${formatearMinutos(margen)}`
       razon = anteriores.length
-        ? `${vence}. Después de ${nombrar(anteriores)} ${queda}.`
+        ? `${vence}. After ${nombrar(anteriores)}, ${queda}.`
         : `${vence}. ${queda[0].toUpperCase()}${queda.slice(1)}.`
     }
 
@@ -281,7 +281,7 @@ export function analizarPrioridades(tareas: TareaMotor[], ctx: ContextoMotor): R
     estado: 'vencida',
     disponibleMin: 0,
     holguraMin: null,
-    razon: `Venció el ${fechaLegible(t.fechaEntrega!, ctx.zonaHoraria)}. Decide si aún la haces, le cambias la fecha o la eliminas.`,
+    razon: `It was due on ${fechaLegible(t.fechaEntrega!, ctx.zonaHoraria)}. Decide whether you will still do it, change its date or delete it.`,
   }))
 
   const resultadoSinFecha: Omit<ResultadoPrioridad, 'orden'>[] = sinFecha.map((t) => ({
@@ -289,7 +289,7 @@ export function analizarPrioridades(tareas: TareaMotor[], ctx: ContextoMotor): R
     estado: 'sin_fecha',
     disponibleMin: null,
     holguraMin: null,
-    razon: `Sin fecha de entrega · prioridad ${NOMBRE_PRIORIDAD[t.prioridad]}. Puedes hacerla cuando te quede tiempo libre.`,
+    razon: `No due date · ${NOMBRE_PRIORIDAD[t.prioridad]} priority. You can do it when you have free time.`,
   }))
 
   const resultadoDecisiones = decisiones.sort((a, b) => a.entrega - b.entrega).map(({ entrega: _e, ...r }) => r)

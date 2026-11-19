@@ -7,8 +7,8 @@ type Props = { fecha: string; onCambiar: (fecha: string) => void }
 export default function SelectorFechaDiario({ fecha, onCambiar }: Props) {
   const hoy = fechaHoy()
   const atajos = [
-    { valor: hoy, nombre: 'Hoy' },
-    { valor: sumarDias(hoy, -1), nombre: 'Ayer' },
+    { valor: hoy, nombre: 'Today' },
+    { valor: sumarDias(hoy, -1), nombre: 'Yesterday' },
   ]
 
   return (
@@ -19,7 +19,7 @@ export default function SelectorFechaDiario({ fecha, onCambiar }: Props) {
           onClick={() => onCambiar(a.valor)}
           aria-pressed={fecha === a.valor}
           className={`rounded-lg px-3 py-2 text-sm font-medium ${
-            fecha === a.valor ? 'bg-teal-700 text-white' : 'bg-white text-slate-600 shadow-sm hover:bg-slate-50'
+            fecha === a.valor ? 'bg-noche-700 text-white' : 'bg-white text-slate-600 shadow-sm hover:bg-slate-50'
           }`}
         >
           {a.nombre}
@@ -31,7 +31,7 @@ export default function SelectorFechaDiario({ fecha, onCambiar }: Props) {
         max={hoy}
         onChange={(e) => e.target.value && e.target.value <= hoy && onCambiar(e.target.value)}
         className={claseCampoBase}
-        aria-label="Elegir otro día"
+        aria-label="Choose another day"
       />
     </div>
   )

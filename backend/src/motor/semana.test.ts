@@ -15,24 +15,24 @@ describe('estadísticas de la semana', () => {
       ],
     })
     expect(e).toMatchObject({ tareasCompletadas: 3, conTiempoReal: 2, minutosEstimados: 180, minutosReales: 225, desviacionPct: 25 })
-    expect(e.descripcionPrecision).toBe('Tus tareas te tomaron un 25 % más de lo estimado (3 h estimadas, 3 h 45 min reales).')
+    expect(e.descripcionPrecision).toBe('Your tasks took 25% longer than estimated (3 h estimated, 3 h 45 min actual).')
   })
 
   it('dentro de ±10 % las estimaciones se consideran acertadas', () => {
     const e = calcularSemana({ ...base, entradas: [], completadas: [{ duracionEstimadaMin: 100, tiempoRealMin: 95 }] })
-    expect(e.descripcionPrecision).toContain('Tus estimaciones fueron acertadas')
+    expect(e.descripcionPrecision).toContain('Your estimates were accurate')
   })
 
   it('cuando tardas menos de lo estimado lo dice en positivo', () => {
     const e = calcularSemana({ ...base, entradas: [], completadas: [{ duracionEstimadaMin: 120, tiempoRealMin: 60 }] })
     expect(e.desviacionPct).toBe(-50)
-    expect(e.descripcionPrecision).toContain('un 50 % menos de lo estimado')
+    expect(e.descripcionPrecision).toContain('50% less time than estimated')
   })
 
   it('sin tiempos reales no inventa una comparación', () => {
     const e = calcularSemana({ ...base, entradas: [], completadas: [{ duracionEstimadaMin: 60, tiempoRealMin: null }] })
     expect(e.desviacionPct).toBeNull()
-    expect(e.descripcionPrecision).toContain('aún no se puede comparar')
+    expect(e.descripcionPrecision).toContain("can't be compared yet")
   })
 
   it('cuenta las entradas y ordena las etiquetas más usadas', () => {

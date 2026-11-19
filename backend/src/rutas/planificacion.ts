@@ -137,14 +137,14 @@ router.get('/dia/:fecha', validarFecha, async (req, res) => {
     // Si a la tarea le falta menos de lo que dura el bloque, se dice para que el usuario pueda acortarlo
     const sobra =
       a.faltabaMin < a.minutos
-        ? ` · Le falta ${formatearMinutos(a.faltabaMin)} y el bloque dura ${formatearMinutos(a.minutos)}: el resto te queda libre`
+        ? ` · It needs ${formatearMinutos(a.faltabaMin)} more and the block lasts ${formatearMinutos(a.minutos)}: the rest is free`
         : ''
     const razon =
       (r.orden !== null
-        ? `N.º ${r.orden} en tu orden sugerido · vence ${cuando(tarea.fechaEntrega!, ctx)}`
+        ? `No. ${r.orden} in your suggested order · due ${cuando(tarea.fechaEntrega!, ctx)}`
         : r.estado === 'no_alcanza'
-          ? 'No alcanza a terminarse antes de su entrega, pero aquí puedes avanzar en ella'
-          : 'Sin fecha de entrega: aprovecha este tiempo libre') + sobra
+          ? 'It can\'t be finished before it is due, but you can make progress on it here'
+          : 'No due date: make use of this free time') + sobra
     return {
       fecha: a.fecha,
       bloqueId: a.bloqueId,
@@ -161,7 +161,7 @@ router.get('/dia/:fecha', validarFecha, async (req, res) => {
 })
 
 const esquemaAplicar = z.object({
-  asignaciones: z.array(z.object({ bloqueId: z.string(), tareaId: z.string() })).min(1, 'Elige al menos una sugerencia'),
+  asignaciones: z.array(z.object({ bloqueId: z.string(), tareaId: z.string() })).min(1, 'Choose at least one suggestion'),
   propuestas: z.number().int().min(1),
 })
 
@@ -184,10 +184,10 @@ router.post('/dia/:fecha/aplicar', validarFecha, async (req, res) => {
   const idsTareas = new Set(tareas.map((t) => t.id))
   for (const a of asignaciones) {
     const bloque = bloquesPorId.get(a.bloqueId)
-    if (!bloque) return res.status(404).json({ error: 'Bloque no encontrado' })
-    if (bloque.dia.fecha.toISOString().slice(0, 10) < hoy) return res.status(400).json({ error: 'No puedes modificar un día que ya pasó' })
-    if (bloque.tareaId) return res.status(409).json({ error: `El bloque "${bloque.titulo}" ya tiene una tarea` })
-    if (!idsTareas.has(a.tareaId)) return res.status(404).json({ error: 'Tarea no encontrada o ya completada' })
+    if (!bloque) return res.status(404).json({ error: 'Block not found' })
+    if (bloque.dia.fecha.toISOString().slice(0, 10) < hoy) return res.status(400).json({ error: 'You can\'t change a day that has already passed' })
+    if (bloque.tareaId) return res.status(409).json({ error: `The block "${bloque.titulo}" already has a task` })
+    if (!idsTareas.has(a.tareaId)) return res.status(404).json({ error: 'Task not found or already completed' })
   }
 
   const estado = asignaciones.length === propuestas ? 'ACEPTADA' : 'EDITADA'
@@ -218,7 +218,7 @@ router.post('/dia/:fecha/descartar', validarFecha, async (req, res) => {
       contenido: JSON.stringify({ propuestas: propuestas.success ? propuestas.data : 0, aplicadas: 0 }),
     },
   })
-  res.json({ mensaje: 'Sugerencia descartada' })
+  res.json({ mensaje: 'Suggestion dismissed' })
 })
 
 export default router

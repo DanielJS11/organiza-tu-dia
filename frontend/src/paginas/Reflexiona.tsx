@@ -10,11 +10,11 @@ import HistorialDiario from '../componentes/diario/HistorialDiario'
 import ReflexionDelDia from '../componentes/diario/ReflexionDelDia'
 import ResumenSemana from '../componentes/diario/ResumenSemana'
 
-// "hoy", "ayer" o "el lunes, 9 de noviembre"
-function nombrarDia(fecha: string) {
-  if (fecha === fechaHoy()) return 'hoy'
-  if (fecha === sumarDias(fechaHoy(), -1)) return 'ayer'
-  return `el ${formatearDia(fecha)}`
+// "Your day today", "Your day yesterday" o "Your day on Monday, November 9"
+function tituloDia(fecha: string) {
+  if (fecha === fechaHoy()) return 'Your day today'
+  if (fecha === sumarDias(fechaHoy(), -1)) return 'Your day yesterday'
+  return `Your day on ${formatearDia(fecha)}`
 }
 
 export default function Reflexiona() {
@@ -27,7 +27,7 @@ export default function Reflexiona() {
   const { entradas, etiquetas } = useHistorialDiario(etiqueta, buscar, version)
   const alBuscar = useCallback((texto: string) => setBuscar(texto), [])
 
-    // Cambiar de día: si la entrada actual tiene cambios sin guardar, primero se pide confirmación
+  // Cambiar de día: si la entrada actual tiene cambios sin guardar, primero se pide confirmación
   function cambiarDia(nueva: string) {
     if (nueva === fecha || !confirmarSalida()) return
     setFecha(nueva)
@@ -41,22 +41,23 @@ export default function Reflexiona() {
 
   return (
     <div>
-            <EncabezadoPagina
-        ruta="/reflexiona"
-        descripcion="Unos minutos para mirar cómo te fue: lo que aprendes hoy te ayuda a planear mejor mañana."
+      <EncabezadoPagina
+        ruta="/reflect"
+        descripcion="A few minutes to look back on how it went: what you learn today helps you plan better tomorrow."
       />
+
       <div className="mt-6">
-                <SelectorFechaDiario fecha={fecha} onCambiar={cambiarDia} />
+        <SelectorFechaDiario fecha={fecha} onCambiar={cambiarDia} />
       </div>
 
       {error && <p role="alert" className="mt-6 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>}
 
       {cargando ? (
-        <p className="mt-8 text-center text-slate-500">Cargando…</p>
+        <p className="mt-8 text-center text-slate-500">Loading…</p>
       ) : (
         dia && (
           <>
-            <p className="mt-6 text-sm text-slate-500">Tu día {nombrarDia(fecha)}</p>
+            <p className="mt-6 text-sm text-slate-500">{tituloDia(fecha)}</p>
             <div className="mt-2 grid gap-6 md:grid-cols-3">
               <div className="md:col-span-2">
                 <EditorEntrada
@@ -72,7 +73,7 @@ export default function Reflexiona() {
                     setVersion((v) => v + 1)
                   }}
                 />
-                                <ReflexionDelDia fecha={fecha} hayEntrada={!!dia.entrada} version={version} />
+                <ReflexionDelDia fecha={fecha} hayEntrada={!!dia.entrada} version={version} />
               </div>
               <ResumenDelDia resumen={dia.resumen} />
             </div>
@@ -81,6 +82,7 @@ export default function Reflexiona() {
       )}
 
       <ResumenSemana version={version} />
+
       <HistorialDiario
         entradas={entradas}
         etiquetas={etiquetas}

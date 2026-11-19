@@ -20,7 +20,7 @@ export async function enviarCorreo(correo: Correo, f: typeof fetch = fetch) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'api-key': clave },
     body: JSON.stringify({
-      sender: { name: 'Organiza tu día', email: remitente },
+      sender: { name: 'Organize Your Day', email: remitente },
       to: [{ email: correo.para }],
       subject: correo.asunto,
       htmlContent: correo.html,
@@ -37,25 +37,25 @@ export async function enviarCorreo(correo: Correo, f: typeof fetch = fetch) {
 const escapar = (t: string) => t.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!)
 
 export function correoRecuperacion(nombre: string, enlace: string, minutos: number) {
-  const texto = `Hola, ${nombre}:
+  const texto = `Hi ${nombre},
 
-Recibimos una solicitud para restablecer la contraseña de tu cuenta en Organiza tu día.
-Abre este enlace para elegir una nueva (vence en ${minutos} minutos y solo se puede usar una vez):
+We received a request to reset the password of your Organize Your Day account.
+Open this link to choose a new one (it expires in ${minutos} minutes and can only be used once):
 
 ${enlace}
 
-Si no fuiste tú, ignora este correo: tu contraseña no cambiará.`
+If it wasn't you, ignore this email: your password will not change.`
 
   const html = `<div style="font-family:Arial,sans-serif;max-width:480px;margin:auto;color:#1e293b">
-  <h2 style="color:#0f766e">Organiza tu día</h2>
-  <p>Hola, ${escapar(nombre)}:</p>
-  <p>Recibimos una solicitud para restablecer la contraseña de tu cuenta.</p>
+  <h2 style="color:#0f766e">Organize Your Day</h2>
+  <p>Hi ${escapar(nombre)},</p>
+  <p>We received a request to reset the password of your account.</p>
   <p style="margin:24px 0">
-    <a href="${escapar(enlace)}" style="background:#0d9488;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none">Elegir una nueva contraseña</a>
+    <a href="${escapar(enlace)}" style="background:#0d9488;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none">Choose a new password</a>
   </p>
-  <p style="font-size:13px;color:#64748b">El enlace vence en ${minutos} minutos y solo se puede usar una vez.
-  Si no fuiste tú, ignora este correo: tu contraseña no cambiará.</p>
+  <p style="font-size:13px;color:#64748b">The link expires in ${minutos} minutes and can only be used once.
+  If it wasn't you, ignore this email: your password will not change.</p>
 </div>`
 
-  return { asunto: 'Restablece tu contraseña', html, texto }
+  return { asunto: 'Reset your password', html, texto }
 }

@@ -8,8 +8,8 @@ export default function SelectorFecha({ fecha, onCambiar }: Props) {
   const hoy = fechaHoy()
   const manana = sumarDias(hoy, 1)
   const atajos = [
-    { valor: hoy, nombre: 'Hoy' },
-    { valor: manana, nombre: 'Mañana' },
+    { valor: hoy, nombre: 'Today' },
+    { valor: manana, nombre: 'Tomorrow' },
   ]
 
   return (
@@ -32,7 +32,7 @@ export default function SelectorFecha({ fecha, onCambiar }: Props) {
         min={hoy}
         onChange={(e) => e.target.value && onCambiar(e.target.value)}
         className={claseCampoBase}
-        aria-label="Elegir otra fecha"
+        aria-label="Choose another date"
       />
     </div>
   )

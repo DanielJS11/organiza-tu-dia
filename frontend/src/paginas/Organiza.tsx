@@ -16,15 +16,15 @@ type Vista = 'lista' | 'prioridades' | 'calendario'
 type FiltroEstado = 'pendientes' | 'completadas' | 'todas'
 
 const vistas: { valor: Vista; nombre: string }[] = [
-    { valor: 'lista', nombre: 'Lista' },
-  { valor: 'prioridades', nombre: 'Por dónde empezar' },
-  { valor: 'calendario', nombre: 'Calendario' },
+  { valor: 'lista', nombre: 'List' },
+  { valor: 'prioridades', nombre: 'Where to start' },
+  { valor: 'calendario', nombre: 'Calendar' },
 ]
 
 const filtrosEstado: { valor: FiltroEstado; nombre: string }[] = [
-  { valor: 'pendientes', nombre: 'Pendientes' },
-  { valor: 'completadas', nombre: 'Completadas' },
-  { valor: 'todas', nombre: 'Todas' },
+  { valor: 'pendientes', nombre: 'Pending' },
+  { valor: 'completadas', nombre: 'Completed' },
+  { valor: 'todas', nombre: 'All' },
 ]
 
 export default function Organiza() {
@@ -48,7 +48,7 @@ export default function Organiza() {
   })
 
   function confirmarEliminar(tarea: Tarea) {
-    if (window.confirm(`¿Eliminar "${tarea.titulo}"? Esta acción no se puede deshacer.`)) {
+    if (window.confirm(`Delete "${tarea.titulo}"? This can't be undone.`)) {
       eliminar(tarea.id)
       setDetalle(null)
     }
@@ -78,16 +78,16 @@ export default function Organiza() {
 
   return (
     <div>
-            <EncabezadoPagina
-        ruta="/organiza"
+      <EncabezadoPagina
+        ruta="/organize"
         descripcion={
           pendientes.length === 0
-            ? 'No tienes tareas pendientes.'
-            : `Tienes ${pendientes.length} ${pendientes.length === 1 ? 'tarea pendiente' : 'tareas pendientes'}, unas ${formatearDuracion(minutosPendientes)} de trabajo estimado.`
+            ? 'You have no pending tasks.'
+            : `You have ${pendientes.length} ${pendientes.length === 1 ? 'pending task' : 'pending tasks'}, about ${formatearDuracion(minutosPendientes)} of estimated work.`
         }
         acciones={
           <button onClick={() => setCreando({})} className={claseBotonPrincipal}>
-            + Nueva tarea
+            + New task
           </button>
         }
       />
@@ -101,12 +101,12 @@ export default function Organiza() {
               value={filtroPrioridad}
               onChange={(e) => setFiltroPrioridad(e.target.value as Prioridad | 'TODAS')}
               className={claseCampoBase}
-              aria-label="Filtrar por prioridad"
+              aria-label="Filter by priority"
             >
-              <option value="TODAS">Todas las prioridades</option>
-              <option value="ALTA">Prioridad alta</option>
-              <option value="MEDIA">Prioridad media</option>
-              <option value="BAJA">Prioridad baja</option>
+              <option value="TODAS">All priorities</option>
+              <option value="ALTA">High priority</option>
+              <option value="MEDIA">Medium priority</option>
+              <option value="BAJA">Low priority</option>
             </select>
           </div>
         )}
@@ -115,23 +115,23 @@ export default function Organiza() {
       {error && <p role="alert" className="mt-6 text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2">{error}</p>}
 
       {cargando ? (
-        <p className="mt-8 text-center text-slate-500">Cargando tareas…</p>
-            ) : vista === 'prioridades' ? (
+        <p className="mt-8 text-center text-slate-500">Loading tasks…</p>
+      ) : vista === 'prioridades' ? (
         <PorDondeEmpezar tareas={tareas} onSeleccionar={setDetalle} />
       ) : vista === 'calendario' ? (
         <div className="mt-6">
           <CalendarioTareas tareas={tareas} onSeleccionarTarea={setDetalle} onSeleccionarFecha={crearDesdeCalendario} />
           <p className="mt-3 text-sm text-slate-500">
-            Haz clic en un día para crear una tarea con esa fecha. Las tareas sin fecha de entrega solo aparecen en la lista.
+            Click a day to create a task with that date. Tasks without a due date only appear in the list.
           </p>
         </div>
       ) : visibles.length === 0 ? (
         <p className="mt-8 rounded-xl border border-dashed border-slate-300 p-8 text-center text-slate-500">
-          {tareas.length === 0 ? 'Aún no tienes tareas. Crea la primera con "+ Nueva tarea".' : 'No hay tareas con estos filtros.'}
+          {tareas.length === 0 ? 'You have no tasks yet. Create the first one with "+ New task".' : 'No tasks match these filters.'}
         </p>
       ) : (
-                <>
-          <h2 className="sr-only">Tus tareas</h2>
+        <>
+          <h2 className="sr-only">Your tasks</h2>
           <ul className="mt-6 space-y-3">
             {visibles.map((t) => (
               <TarjetaTarea key={t.id} tarea={t} {...accionesTarea(t)} />
@@ -141,7 +141,7 @@ export default function Organiza() {
       )}
 
       {detalle && (
-        <Modal titulo="Detalle de la tarea" onCerrar={() => setDetalle(null)}>
+        <Modal titulo="Task details" onCerrar={() => setDetalle(null)}>
           <ul className="rounded-xl border border-slate-200">
             <TarjetaTarea tarea={detalle} {...accionesTarea(detalle)} />
           </ul>
@@ -149,7 +149,7 @@ export default function Organiza() {
       )}
 
       {creando && (
-        <Modal titulo="Nueva tarea" onCerrar={() => setCreando(null)}>
+        <Modal titulo="New task" onCerrar={() => setCreando(null)}>
           <FormularioTarea
             fechaInicial={creando.fechaInicial}
             onGuardar={async (datos) => {
@@ -162,7 +162,7 @@ export default function Organiza() {
       )}
 
       {editando && (
-        <Modal titulo="Editar tarea" onCerrar={() => setEditando(null)}>
+        <Modal titulo="Edit task" onCerrar={() => setEditando(null)}>
           <FormularioTarea
             tarea={editando}
             onGuardar={async (datos) => {

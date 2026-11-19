@@ -12,7 +12,7 @@ export async function api<T>(ruta: string, opciones: RequestInit = {}): Promise<
   if (!respuesta.ok) {
     // Si la sesión venció o la contraseña cambió en otro dispositivo, se vuelve a la página de ingreso
     if (respuesta.status === 401 && !ruta.startsWith('/auth/')) window.dispatchEvent(new Event(EVENTO_SESION_EXPIRADA))
-    throw new Error(datos.error || 'No se pudo conectar con el servidor')
+    throw new Error(datos.error || 'Could not connect to the server')
   }
   return datos as T
 }

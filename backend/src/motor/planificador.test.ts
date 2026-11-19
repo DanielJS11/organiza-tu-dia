@@ -102,9 +102,9 @@ describe('regla 3: orden sugerido por entregas', () => {
       ['B', 'a_tiempo', 2],
       ['C', 'a_tiempo', 3],
     ])
-    expect(resultado[0].razon).toBe('Vence mañana y necesita 2 h; tienes 8 h de trabajo hasta entonces.')
+    expect(resultado[0].razon).toBe('Due tomorrow and needs 2 h; you have 8 h of work until then.')
     // Hasta el 26 hay 4 días × 4 h = 16 h; menos 2 h de A y 3 h de B
-    expect(resultado[1].razon).toBe('Vence en 3 días y necesita 3 h; después de "A" aún te sobran 11 h.')
+    expect(resultado[1].razon).toBe('Due in 3 days and needs 3 h; after "A" you still have 11 h to spare.')
   })
 
   it('una entrega al mediodía va antes que una a medianoche del mismo día', () => {
@@ -148,7 +148,7 @@ describe('margen', () => {
       contexto(),
     )
     expect(resultado[0].estado).toBe('ajustada')
-    expect(resultado[0].razon).toBe('Vence hoy y necesita 3 h 20 min. Te queda un margen corto: 40 min.')
+    expect(resultado[0].razon).toBe('Due today and needs 3 h 20 min. You have a tight margin: 40 min.')
   })
 
   it('margen corto si sobra menos del 25 % de lo que dura la tarea', () => {
@@ -174,7 +174,7 @@ describe('margen', () => {
       ],
       contexto(),
     )
-    expect(resultado[1].razon).toBe('Vence hoy y necesita 3 h. Después de "primera" cabe justo, sin tiempo de sobra.')
+    expect(resultado[1].razon).toBe('Due today and needs 3 h. After "primera", it just fits, with no time to spare.')
   })
 })
 
@@ -193,8 +193,8 @@ describe('regla 2: si no alcanza para todo, se protege lo más importante', () =
       ['A', 'a_tiempo', 1],
       ['B', 'a_tiempo', 2],
     ])
-    expect(resultado[0].razon).toContain('Aunque le dediques todo tu tiempo no alcanza')
-    expect(resultado[0].razon).toContain('necesita 15 h y hasta su entrega solo tienes 8 h de trabajo')
+    expect(resultado[0].razon).toContain("Even if you give it all your time, there isn't enough")
+    expect(resultado[0].razon).toContain('it needs 15 h and until then you only have 8 h of work')
   })
 
   it('cuando no caben todas, sale la de menor prioridad aunque venza antes', () => {
@@ -213,7 +213,7 @@ describe('regla 2: si no alcanza para todo, se protege lo más importante', () =
       ['media-mañana', 'ajustada', 2], // 8 h − 4 h − 4 h = cabe justo
     ])
     expect(resultado[0].razon).toBe(
-      'No alcanza junto con "alta-mañana" y "media-mañana": hasta mañana tienes 8 h de trabajo y entre todas piden 9 h. Se deja por fuera porque es la de menor prioridad. Puedes mover su fecha o reducirla.',
+      'There isn\'t enough time for it together with "alta-mañana" and "media-mañana": until tomorrow you have 8 h of work and together they need 9 h. It is left out because it has the lowest priority. You can move its date or reduce it.',
     )
   })
 
@@ -229,8 +229,8 @@ describe('regla 2: si no alcanza para todo, se protege lo más importante', () =
       ['larga', 'no_alcanza', null],
       ['corta', 'a_tiempo', 1],
     ])
-    expect(resultado[0].razon).toContain('hasta la entrega de hoy tienes 4 h de trabajo y entre todas piden 5 h')
-    expect(resultado[0].razon).toContain('es la más larga entre las de su misma prioridad')
+    expect(resultado[0].razon).toContain("until today's deadline you have 4 h of work and together they need 5 h")
+    expect(resultado[0].razon).toContain('it is the longest among those with the same priority')
   })
 
   it('una tarea de alta prioridad no se sacrifica por una de menor prioridad', () => {
@@ -273,7 +273,7 @@ describe('regla 2: si no alcanza para todo, se protege lo más importante', () =
       ],
       contexto(),
     )
-    expect(resultado[0].razon).toContain('en los próximos 3 días tienes 16 h de trabajo y entre todas piden 18 h')
+    expect(resultado[0].razon).toContain('over the next 3 days you have 16 h of work and together they need 18 h')
   })
 
   it('con más de dos tareas en conflicto las menciona por cantidad', () => {
@@ -287,7 +287,7 @@ describe('regla 2: si no alcanza para todo, se protege lo más importante', () =
       ],
       contexto(),
     )
-    expect(resultado[0].razon).toContain('No alcanza junto con otras 3 tareas')
+    expect(resultado[0].razon).toContain("There isn't enough time for it together with 3 other tasks")
   })
 })
 
@@ -304,7 +304,7 @@ describe('vencidas y sin fecha', () => {
       ['vencida', 'vencida', null],
       ['futura', 'a_tiempo', 1],
     ])
-    expect(resultado[0].razon).toContain('Decide si aún la haces')
+    expect(resultado[0].razon).toContain('Decide whether you will still do it')
   })
 
   it('las tareas sin fecha van al final, por prioridad y sin número de orden', () => {

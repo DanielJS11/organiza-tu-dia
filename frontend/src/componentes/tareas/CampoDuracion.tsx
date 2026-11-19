@@ -18,7 +18,7 @@ export default function CampoDuracion({ etiqueta, minutos, onChange }: Props) {
           value={horas}
           onChange={(e) => onChange(Number(e.target.value) * 60 + resto)}
           className={`${claseCampoBase} w-20`}
-          aria-label="Horas"
+          aria-label="Hours"
         />
         <span className="text-sm text-slate-500">h</span>
         <input
@@ -29,7 +29,7 @@ export default function CampoDuracion({ etiqueta, minutos, onChange }: Props) {
           value={resto}
           onChange={(e) => onChange(horas * 60 + Number(e.target.value))}
           className={`${claseCampoBase} w-20`}
-          aria-label="Minutos"
+          aria-label="Minutes"
         />
         <span className="text-sm text-slate-500">min</span>
       </div>

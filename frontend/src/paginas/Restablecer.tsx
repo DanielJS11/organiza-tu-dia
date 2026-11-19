@@ -20,7 +20,7 @@ export default function Restablecer() {
     e.preventDefault()
     setError('')
     if (contrasena !== confirmacion) {
-      setError('Las dos contraseñas no coinciden')
+      setError('The two passwords do not match')
       return
     }
     setEnviando(true)
@@ -34,17 +34,17 @@ export default function Restablecer() {
   }
 
   const pie = (
-    <Link to="/recuperar" className="text-teal-700 font-medium">
-      Pedir un enlace nuevo
+    <Link to="/forgot-password" className="text-teal-700 font-medium">
+      Request a new link
     </Link>
   )
 
   if (!token) {
     return (
-            <MarcoAcceso>
+      <MarcoAcceso>
         <div className="space-y-4">
-          <h1 className="text-2xl font-semibold text-slate-800">Enlace incompleto</h1>
-          <p className="text-sm text-slate-600">Abre el enlace completo que te llegó al correo, o pide uno nuevo.</p>
+          <h1 className="text-3xl font-semibold text-slate-800">Incomplete link</h1>
+          <p className="text-sm text-slate-600">Open the full link from your email, or request a new one.</p>
           <p className="text-center text-sm">{pie}</p>
         </div>
       </MarcoAcceso>
@@ -53,16 +53,16 @@ export default function Restablecer() {
 
   return (
     <FormularioAcceso
-      titulo="Elige una nueva contraseña"
-      subtitulo="Al guardarla, se cerrará la sesión en tus otros dispositivos."
-      textoBoton="Guardar contraseña"
+      titulo="Choose a new password"
+      subtitulo="When you save it, you will be logged out on your other devices."
+      textoBoton="Save password"
       error={error}
       enviando={enviando}
       onSubmit={enviar}
       pie={pie}
     >
       <Campo
-        etiqueta="Nueva contraseña"
+        etiqueta="New password"
         type="password"
         value={contrasena}
         onChange={(e) => setContrasena(e.target.value)}
@@ -71,7 +71,7 @@ export default function Restablecer() {
         autoComplete="new-password"
       />
       <Campo
-        etiqueta="Repítela"
+        etiqueta="Repeat it"
         type="password"
         value={confirmacion}
         onChange={(e) => setConfirmacion(e.target.value)}

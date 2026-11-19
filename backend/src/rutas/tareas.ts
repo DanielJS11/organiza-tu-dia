@@ -9,15 +9,15 @@ const router = Router()
 router.use(requiereSesion)
 
 const esquemaTarea = z.object({
-  titulo: z.string().trim().min(1, 'Escribe un título').max(120, 'El título es muy largo'),
+  titulo: z.string().trim().min(1, 'Enter a title').max(120, 'The title is too long'),
   descripcion: z.string().trim().max(1000).nullable().optional(),
   fechaEntrega: z.iso.datetime({ offset: true }).nullable().optional(),
   prioridad: z.enum(['ALTA', 'MEDIA', 'BAJA']).optional(),
   duracionEstimadaMin: z
     .number()
     .int()
-    .min(5, 'La duración mínima es 5 minutos')
-    .max(1440, 'La duración máxima es 24 horas'),
+    .min(5, 'The minimum duration is 5 minutes')
+    .max(1440, 'The maximum duration is 24 hours'),
   estado: z.enum(['PENDIENTE', 'EN_PROGRESO', 'COMPLETADA']).optional(),
   tiempoRealMin: z.number().int().min(0).max(1440).nullable().optional(),
 })
@@ -36,7 +36,7 @@ function esFechaPasada(fecha: string) {
   return new Date(fecha).getTime() < Date.now() - 60_000
 }
 
-const MENSAJE_FECHA_PASADA = 'La fecha de entrega no puede estar en el pasado'
+const MENSAJE_FECHA_PASADA = 'The due date cannot be in the past'
 
 // Lista: pendientes primero, luego por fecha de entrega más cercana y prioridad
 router.get('/', async (req, res) => {
@@ -56,7 +56,7 @@ router.post('/', async (req, res) => {
   if (!resultado.success) {
     return res.status(400).json({ error: resultado.error.issues[0].message })
   }
-    const { fechaEntrega, ...datos } = resultado.data
+  const { fechaEntrega, ...datos } = resultado.data
   if (fechaEntrega && esFechaPasada(fechaEntrega)) {
     return res.status(400).json({ error: MENSAJE_FECHA_PASADA })
   }
@@ -76,15 +76,14 @@ router.patch('/:id', async (req, res) => {
   // Verifica que la tarea exista y sea de este usuario
   const existe = await prisma.tarea.findFirst({ where: { id: req.params.id, usuarioId: req.usuarioId } })
   if (!existe) {
-    return res.status(404).json({ error: 'Tarea no encontrada' })
+    return res.status(404).json({ error: 'Task not found' })
   }
 
-    // Una tarea completada no se puede editar: solo se puede volver a abrir (desmarcarla)
-   // Una tarea completada es definitiva: no se puede editar ni volver a abrir
+  // Una tarea completada es definitiva: no se puede editar ni volver a abrir
   if (existe.estado === 'COMPLETADA') {
-    return res.status(409).json({ error: 'Las tareas completadas no se pueden modificar' })
+    return res.status(409).json({ error: 'Completed tasks cannot be changed' })
   }
-  
+
   const { fechaEntrega, ...datos } = resultado.data
 
   // Solo se valida la fecha si cambió; así una tarea ya vencida puede editarse sin moverle la fecha
@@ -103,9 +102,9 @@ router.patch('/:id', async (req, res) => {
 router.delete('/:id', async (req, res) => {
   const { count } = await prisma.tarea.deleteMany({ where: { id: req.params.id, usuarioId: req.usuarioId } })
   if (count === 0) {
-    return res.status(404).json({ error: 'Tarea no encontrada' })
+    return res.status(404).json({ error: 'Task not found' })
   }
-  res.json({ mensaje: 'Tarea eliminada' })
+  res.json({ mensaje: 'Task deleted' })
 })
 
 export default router

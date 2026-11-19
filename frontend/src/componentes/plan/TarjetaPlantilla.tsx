@@ -16,13 +16,13 @@ export default function TarjetaPlantilla({ plantilla, onVer }: Props) {
       <p className="mt-1 text-sm text-slate-500">{plantilla.descripcion}</p>
       {inicio && fin && (
         <p className="mt-3 text-sm text-slate-500">
-          {formatearHora(inicio)} – {formatearHora(fin)} · {bloques.length} bloques
+          {formatearHora(inicio)} – {formatearHora(fin)} · {bloques.length} blocks
         </p>
       )}
       <div className="mt-4">
         <ResumenBloques bloques={bloques} />
       </div>
-      <span className="mt-4 text-sm font-medium text-teal-700">Ver detalle →</span>
+      <span className="mt-4 text-sm font-medium text-teal-700">See details →</span>
     </button>
   )
 }

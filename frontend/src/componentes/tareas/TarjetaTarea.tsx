@@ -31,7 +31,7 @@ export default function TarjetaTarea({ tarea, onCompletar, onEditar, onEliminar 
         checked={completada}
         disabled={completada}
         onChange={onCompletar}
-        aria-label={completada ? 'Tarea completada' : 'Marcar como completada'}
+        aria-label={completada ? 'Task completed' : 'Mark as completed'}
         className="mt-1 h-5 w-5 shrink-0 accent-teal-600 cursor-pointer disabled:cursor-default"
       />
 
@@ -42,16 +42,16 @@ export default function TarjetaTarea({ tarea, onCompletar, onEditar, onEliminar 
             {nombresPrioridad[tarea.prioridad]}
           </span>
           {tarea.estado === 'EN_PROGRESO' && (
-            <span className="rounded-full bg-sky-50 px-2 py-0.5 text-xs font-medium text-sky-700">En progreso</span>
+            <span className="rounded-full bg-sky-50 px-2 py-0.5 text-xs font-medium text-sky-700">In progress</span>
           )}
         </div>
 
         {tarea.descripcion && <p className="mt-1 text-sm text-slate-500">{tarea.descripcion}</p>}
 
         <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm">
-          <span className="text-slate-500">Estimado: {formatearDuracion(tarea.duracionEstimadaMin)}</span>
+          <span className="text-slate-500">Estimated: {formatearDuracion(tarea.duracionEstimadaMin)}</span>
           {completada && tarea.tiempoRealMin != null && (
-            <span className="text-slate-500">Real: {formatearDuracion(tarea.tiempoRealMin)}</span>
+            <span className="text-slate-500">Actual: {formatearDuracion(tarea.tiempoRealMin)}</span>
           )}
           {entrega && <span className={colorEntrega[entrega.tono]}>{entrega.texto}</span>}
         </div>
@@ -60,11 +60,11 @@ export default function TarjetaTarea({ tarea, onCompletar, onEditar, onEliminar 
       <div className="col-start-2 flex gap-1 text-sm -ml-2 sm:col-start-3 sm:ml-0">
         {!completada && (
           <button onClick={onEditar} className="rounded-lg px-2 py-1 text-slate-500 hover:bg-slate-100 hover:text-slate-800">
-            Editar
+            Edit
           </button>
         )}
         <button onClick={onEliminar} className="rounded-lg px-2 py-1 text-slate-500 hover:bg-red-50 hover:text-red-600">
-          Eliminar
+          Delete
         </button>
       </div>
     </li>

@@ -39,9 +39,9 @@ export default function ResumenSemana({ version }: { version: number }) {
     <section className="mt-10 rounded-2xl bg-white p-6 shadow-sm">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="font-semibold text-slate-800">Tu semana</h2>
+          <h2 className="font-semibold text-slate-800">Your week</h2>
           <p className="text-sm text-slate-500">
-            Del {formatearDia(e.desde)} al {formatearDia(e.hasta)}
+            From {formatearDia(e.desde)} to {formatearDia(e.hasta)}
           </p>
         </div>
         {usuario?.iaActivada && (
@@ -50,23 +50,23 @@ export default function ResumenSemana({ version }: { version: number }) {
             disabled={pidiendo}
             className="rounded-lg bg-noche-600 px-4 py-2 text-sm font-medium text-white hover:bg-noche-700 disabled:opacity-60"
           >
-            {pidiendo ? 'Pensando…' : resumen ? 'Actualizar resumen con IA' : 'Resumir mi semana con IA'}
+            {pidiendo ? 'Thinking…' : resumen ? 'Update summary with AI' : 'Summarize my week with AI'}
           </button>
         )}
       </div>
 
       <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <Dato valor={String(e.tareasCompletadas)} etiqueta="tareas completadas" />
-        <Dato valor={`${e.diasPlanificados} / 7`} etiqueta="días con plan" />
-        <Dato valor={`${e.diasConEntrada} / 7`} etiqueta="días con entrada" />
+        <Dato valor={String(e.tareasCompletadas)} etiqueta="tasks completed" />
+        <Dato valor={`${e.diasPlanificados} / 7`} etiqueta="days with a plan" />
+        <Dato valor={`${e.diasConEntrada} / 7`} etiqueta="days with an entry" />
         <Dato
-          valor={e.desviacionPct === null ? '—' : `${e.desviacionPct > 0 ? '+' : ''}${e.desviacionPct} %`}
-          etiqueta="tiempo real vs. estimado"
+          valor={e.desviacionPct === null ? '—' : `${e.desviacionPct > 0 ? '+' : ''}${e.desviacionPct}%`}
+          etiqueta="actual vs. estimated time"
         />
       </div>
       <p className="mt-3 text-sm text-slate-600">{e.descripcionPrecision}</p>
       {e.etiquetas.length > 0 && (
-        <p className="mt-1 text-sm text-slate-500">Etiquetas más usadas: {e.etiquetas.map((x) => `#${x.nombre} (${x.veces})`).join(', ')}</p>
+        <p className="mt-1 text-sm text-slate-500">Most used tags: {e.etiquetas.map((x) => `#${x.nombre} (${x.veces})`).join(', ')}</p>
       )}
 
       {error && <p role="alert" className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>}
@@ -77,7 +77,7 @@ export default function ResumenSemana({ version }: { version: number }) {
             <p>{resumen.respuesta.resumen}</p>
             {resumen.respuesta.patrones.length > 0 && (
               <>
-                <p className="mt-2 font-medium text-noche-900">Lo que se repite:</p>
+                <p className="mt-2 font-medium text-noche-900">What keeps coming up:</p>
                 <ul className="mt-1 list-disc space-y-1 pl-5">
                   {resumen.respuesta.patrones.map((p) => (
                     <li key={p}>{p}</li>
@@ -85,7 +85,7 @@ export default function ResumenSemana({ version }: { version: number }) {
                 </ul>
               </>
             )}
-            <p className="mt-2 font-medium text-noche-900">Para la próxima semana:</p>
+            <p className="mt-2 font-medium text-noche-900">For next week:</p>
             <ul className="mt-1 list-disc space-y-1 pl-5">
               {resumen.respuesta.recomendaciones.map((r) => (
                 <li key={r}>{r}</li>

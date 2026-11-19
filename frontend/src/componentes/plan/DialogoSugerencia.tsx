@@ -13,10 +13,10 @@ type Props = {
   onCerrar: () => void
 }
 
-// "Hoy", "Mañana" o "Jueves, 12 de noviembre"
+// "Today", "Tomorrow" or "Thursday, November 12"
 function tituloDia(fecha: string) {
-  if (fecha === fechaHoy()) return 'Hoy'
-  if (fecha === sumarDias(fechaHoy(), 1)) return 'Mañana'
+  if (fecha === fechaHoy()) return 'Today'
+  if (fecha === sumarDias(fechaHoy(), 1)) return 'Tomorrow'
   const texto = formatearDia(fecha)
   return texto.charAt(0).toUpperCase() + texto.slice(1)
 }
@@ -68,15 +68,15 @@ export default function DialogoSugerencia({ propuesta, avisos, onAplicar, onDesc
 
   if (propuesta.length === 0) {
     return (
-      <Modal titulo="Sugerir distribución" onCerrar={onCerrar}>
+      <Modal titulo="Suggest a schedule" onCerrar={onCerrar}>
         <p className="text-sm text-slate-600">
-          No hay nada que proponer: o no quedan bloques de estudio, trabajo o enfoque libres en tus días planificados, o tus tareas
-          pendientes ya tienen todo su tiempo planeado.
+          There is nothing to suggest: either there are no free study, work or focus blocks left in your planned days, or your pending
+          tasks already have all their time planned.
         </p>
         <Avisos avisos={avisos} />
         <div className="mt-6 flex justify-end">
           <button onClick={onCerrar} className={claseBotonSecundario}>
-            Entendido
+            Got it
           </button>
         </div>
       </Modal>
@@ -84,10 +84,10 @@ export default function DialogoSugerencia({ propuesta, avisos, onAplicar, onDesc
   }
 
   return (
-    <Modal titulo="Sugerencia de distribución" onCerrar={onCerrar}>
+    <Modal titulo="Suggested schedule" onCerrar={onCerrar}>
       <p className="text-sm text-slate-600">
-        Reparte tus tareas en los bloques libres de tus días planificados, desde hoy, siguiendo tu orden sugerido: lo que vence antes va
-        primero. Es solo una sugerencia: desmarca lo que no quieras y aplica el resto.
+        Spreads your tasks across the free blocks of your planned days, starting today, following your suggested order: whatever is due
+        first goes first. It's only a suggestion: uncheck what you don't want and apply the rest.
       </p>
 
       <Avisos avisos={avisos} />
@@ -130,14 +130,14 @@ export default function DialogoSugerencia({ propuesta, avisos, onAplicar, onDesc
 
       <div className="mt-6 flex flex-wrap justify-end gap-2">
         <button onClick={() => ejecutar(onDescartar)} disabled={enviando} className={claseBotonSecundario}>
-          Descartar
+          Dismiss
         </button>
         <button
           onClick={() => ejecutar(() => onAplicar(propuesta.filter((p) => elegidas.has(p.bloqueId))))}
           disabled={enviando || elegidas.size === 0}
           className={claseBotonPrincipal}
         >
-          {enviando ? 'Aplicando…' : elegidas.size === propuesta.length ? 'Aplicar todo' : `Aplicar ${elegidas.size} de ${propuesta.length}`}
+          {enviando ? 'Applying…' : elegidas.size === propuesta.length ? 'Apply all' : `Apply ${elegidas.size} of ${propuesta.length}`}
         </button>
       </div>
     </Modal>

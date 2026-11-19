@@ -27,35 +27,35 @@ export default function Recuperar() {
   }
 
   const volver = (
-    <Link to="/ingresar" className="text-teal-700 font-medium">
-      Volver a ingresar
+    <Link to="/login" className="text-teal-700 font-medium">
+      Back to log in
     </Link>
   )
 
   if (mensaje) {
     return (
-            <MarcoAcceso>
+      <MarcoAcceso>
         <div className="space-y-4" role="status">
-          <h1 className="text-3xl font-semibold text-slate-800">Revisa tu correo</h1>
+          <h1 className="text-3xl font-semibold text-slate-800">Check your email</h1>
           <p className="text-sm text-slate-600">{mensaje}</p>
-          <p className="text-sm text-slate-500">El enlace vence en 30 minutos.</p>
+          <p className="text-sm text-slate-500">The link expires in 30 minutes.</p>
           <p className="text-center text-sm">{volver}</p>
         </div>
-        </MarcoAcceso>
+      </MarcoAcceso>
     )
   }
 
   return (
     <FormularioAcceso
-      titulo="Recupera tu contraseña"
-      subtitulo="Escribe el correo de tu cuenta y te enviaremos un enlace para elegir una nueva."
-      textoBoton="Enviar enlace"
+      titulo="Reset your password"
+      subtitulo="Enter your account email and we will send you a link to choose a new one."
+      textoBoton="Send link"
       error={error}
       enviando={enviando}
       onSubmit={enviar}
       pie={volver}
     >
-      <Campo etiqueta="Correo" type="email" value={correo} onChange={(e) => setCorreo(e.target.value)} required autoComplete="email" />
+      <Campo etiqueta="Email" type="email" value={correo} onChange={(e) => setCorreo(e.target.value)} required autoComplete="email" />
     </FormularioAcceso>
   )
 }

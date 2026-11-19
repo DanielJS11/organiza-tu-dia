@@ -13,7 +13,7 @@ export default function Plantilla() {
   // El título de la pestaña del navegador dice en qué sección estás (lo leen los lectores de pantalla)
   useEffect(() => {
     const seccion = secciones.find((s) => pathname.startsWith(s.ruta))
-    document.title = seccion ? `${seccion.nombre} · Organiza tu día` : 'Organiza tu día'
+    document.title = seccion ? `${seccion.nombre} · Organize Your Day` : 'Organize Your Day'
   }, [pathname])
 
   // Si hay cambios sin guardar (por ejemplo, en el diario), se pide confirmación antes de salir
@@ -26,16 +26,16 @@ export default function Plantilla() {
         href="#contenido"
         className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:shadow"
       >
-        Saltar al contenido
+        Skip to content
       </a>
       <header className="border-b border-slate-200 bg-white/90 backdrop-blur">
         <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-x-6 gap-y-3 px-4 py-3">
           <NavLink to="/" onClick={proteger} className="flex items-center gap-2.5 rounded-lg">
             <Logo />
-            <span className="text-lg font-semibold tracking-tight text-slate-800">Organiza tu día</span>
+            <span className="text-lg font-semibold tracking-tight text-slate-800">Organize Your Day</span>
           </NavLink>
 
-          <nav aria-label="Secciones" className="order-last -mx-1 flex w-full gap-1 sm:order-none sm:mx-0 sm:w-auto">
+          <nav aria-label="Sections" className="order-last -mx-1 flex w-full gap-1 sm:order-none sm:mx-0 sm:w-auto">
             {secciones.map((s) => (
               <NavLink
                 key={s.ruta}
@@ -59,7 +59,7 @@ export default function Plantilla() {
               onClick={() => confirmarSalida() && salir()}
               className="rounded-full px-3 py-1.5 text-slate-600 hover:bg-slate-100 hover:text-slate-800"
             >
-              Salir
+              Log out
             </button>
           </div>
         </div>

@@ -17,13 +17,13 @@ function normalizarEtiqueta(texto: string) {
 }
 
 const esquemaEntrada = z.object({
-  texto: z.string().trim().min(1, 'Escribe algo antes de guardar').max(5000, 'La entrada es muy larga (máximo 5000 caracteres)'),
+  texto: z.string().trim().min(1, 'Write something before saving').max(5000, 'The entry is too long (5000 characters max)'),
   etiquetas: z
     .array(z.string())
     .default([])
     .transform((lista) => [...new Set(lista.map(normalizarEtiqueta).filter(Boolean))])
-    .refine((lista) => lista.length <= MAX_ETIQUETAS, `Usa máximo ${MAX_ETIQUETAS} etiquetas`)
-    .refine((lista) => lista.every((e) => e.length <= 30), 'Cada etiqueta puede tener máximo 30 caracteres'),
+    .refine((lista) => lista.length <= MAX_ETIQUETAS, `Use up to ${MAX_ETIQUETAS} tags`)
+    .refine((lista) => lista.every((e) => e.length <= 30), 'Each tag can have up to 30 characters'),
 })
 
 // Lo que se devuelve de una entrada: las etiquetas como lista de nombres
@@ -102,7 +102,7 @@ export async function resumenDelDia(usuarioId: string, zonaHoraria: string, fech
   return {
     plan: dia
       ? {
-          nombre: dia.plantilla?.nombre ?? 'Plan personalizado',
+          nombre: dia.plantilla?.nombre ?? 'Custom plan',
           bloques: bloquesTrabajo.map((b) => ({
             titulo: b.titulo,
             horaInicio: b.horaInicio,
@@ -144,7 +144,7 @@ router.put('/:fecha', validarFecha, async (req, res) => {
 
   const usuario = await prisma.usuario.findUniqueOrThrow({ where: { id: usuarioId } })
   if (fecha > hoyEnZona(usuario.zonaHoraria)) {
-    return res.status(400).json({ error: 'Solo puedes escribir sobre hoy o sobre días que ya pasaron' })
+    return res.status(400).json({ error: 'You can only write about today or days that have already passed' })
   }
 
   const guardada = await prisma.$transaction(async (tx) => {
@@ -167,9 +167,9 @@ router.put('/:fecha', validarFecha, async (req, res) => {
 router.delete('/:fecha', validarFecha, async (req, res) => {
   const fecha = String(req.params.fecha)
   const { count } = await prisma.entradaDiario.deleteMany({ where: { usuarioId: req.usuarioId!, fecha: aFechaBD(fecha) } })
-  if (count === 0) return res.status(404).json({ error: 'No hay una entrada para ese día' })
+  if (count === 0) return res.status(404).json({ error: 'There is no entry for that day' })
   await limpiarEtiquetas(req.usuarioId!)
-  res.json({ mensaje: 'Entrada eliminada' })
+  res.json({ mensaje: 'Entry deleted' })
 })
 
 export default router

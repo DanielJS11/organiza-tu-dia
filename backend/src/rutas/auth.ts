@@ -14,20 +14,20 @@ const enProduccion = process.env.NODE_ENV === 'production'
 const limiteIntentos = rateLimit({
   windowMs: 15 * 60 * 1000,
   limit: 10,
-  message: { error: 'Demasiados intentos. Espera unos minutos.' },
+  message: { error: 'Too many attempts. Please wait a few minutes.' },
 })
 
-const esquemaContrasena = z.string().min(8, 'La contraseña debe tener al menos 8 caracteres').max(72)
+const esquemaContrasena = z.string().min(8, 'The password must be at least 8 characters long').max(72)
 
 const esquemaRegistro = z.object({
-  nombre: z.string().trim().min(2, 'El nombre debe tener al menos 2 caracteres').max(60),
-  correo: z.string().trim().toLowerCase().email('Correo no válido'),
-    contrasena: esquemaContrasena,
+  nombre: z.string().trim().min(2, 'The name must be at least 2 characters long').max(60),
+  correo: z.string().trim().toLowerCase().email('Invalid email'),
+  contrasena: esquemaContrasena,
 })
 
 const esquemaIngreso = z.object({
-  correo: z.string().trim().toLowerCase().email('Correo no válido'),
-  contrasena: z.string().min(1, 'Escribe tu contraseña'),
+  correo: z.string().trim().toLowerCase().email('Invalid email'),
+  contrasena: z.string().min(1, 'Enter your password'),
 })
 
 // Datos del usuario que sí se pueden enviar al frontend (nunca el hash)
@@ -61,7 +61,7 @@ router.post('/registro', limiteIntentos, async (req, res) => {
 
   const existe = await prisma.usuario.findUnique({ where: { correo } })
   if (existe) {
-    return res.status(409).json({ error: 'Ya existe una cuenta con ese correo' })
+    return res.status(409).json({ error: 'An account with that email already exists' })
   }
 
   const usuario = await prisma.usuario.create({
@@ -83,11 +83,11 @@ router.post('/login', limiteIntentos, async (req, res) => {
   const valida = usuario && (await bcrypt.compare(contrasena, usuario.hashContrasena))
   if (!usuario || !valida) {
     // Mismo mensaje en ambos casos para no revelar qué correos están registrados
-    return res.status(401).json({ error: 'Correo o contraseña incorrectos' })
+    return res.status(401).json({ error: 'Incorrect email or password' })
   }
 
   guardarSesion(res, usuario.id)
-    // Se responde solo con los campos públicos (lista explícita): así ningún campo nuevo
+  // Se responde solo con los campos públicos (lista explícita): así ningún campo nuevo
   // del modelo, como el token de recuperación, se envía por accidente
   res.json(await prisma.usuario.findUniqueOrThrow({ where: { id: usuario.id }, select: camposPublicos }))
 })
@@ -97,21 +97,21 @@ router.post('/login', limiteIntentos, async (req, res) => {
 // Paso 1: pedir el enlace. La respuesta es siempre la misma, exista o no la cuenta,
 // para no revelar qué correos están registrados.
 router.post('/olvide', limiteIntentos, async (req, res) => {
-  const resultado = z.object({ correo: z.string().trim().toLowerCase().email('Correo no válido') }).safeParse(req.body)
+  const resultado = z.object({ correo: z.string().trim().toLowerCase().email('Invalid email') }).safeParse(req.body)
   if (!resultado.success) return res.status(400).json({ error: resultado.error.issues[0].message })
 
   const usuario = await prisma.usuario.findUnique({ where: { correo: resultado.data.correo } })
   if (usuario) {
     const { token, hash, expira } = crearTokenRecuperacion()
     await prisma.usuario.update({ where: { id: usuario.id }, data: { tokenRecuperacion: hash, tokenRecuperacionExpira: expira } })
-    const enlace = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/restablecer?token=${token}`
+    const enlace = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/reset-password?token=${token}`
     try {
       await enviarCorreo({ para: usuario.correo, ...correoRecuperacion(usuario.nombre, enlace, MINUTOS_VALIDEZ_RECUPERACION) })
     } catch (error) {
       console.error('[correo] No se pudo enviar el correo de recuperación:', (error as Error).message)
     }
   }
-  res.json({ mensaje: 'Si ese correo tiene una cuenta, te enviamos un enlace para restablecer la contraseña. Revisa también la carpeta de spam.' })
+  res.json({ mensaje: 'If that email has an account, we sent you a link to reset your password. Check your spam folder too.' })
 })
 
 // Paso 2: elegir la nueva contraseña con el token del enlace (vale una sola vez y por tiempo limitado)
@@ -121,7 +121,7 @@ router.post('/restablecer', limiteIntentos, async (req, res) => {
 
   const usuario = await prisma.usuario.findUnique({ where: { tokenRecuperacion: hashToken(resultado.data.token) } })
   if (!usuario || !usuario.tokenRecuperacionExpira || usuario.tokenRecuperacionExpira < new Date()) {
-    return res.status(400).json({ error: 'El enlace no es válido o ya venció. Pide uno nuevo.' })
+    return res.status(400).json({ error: 'The link is invalid or has expired. Request a new one.' })
   }
 
   const actualizado = await prisma.usuario.update({
@@ -140,13 +140,13 @@ router.post('/restablecer', limiteIntentos, async (req, res) => {
 
 router.post('/logout', (_req, res) => {
   res.clearCookie(NOMBRE_COOKIE)
-  res.json({ mensaje: 'Sesión cerrada' })
+  res.json({ mensaje: 'Logged out' })
 })
 
 // Preferencias del usuario (por ahora: activar o desactivar la IA)
 router.patch('/preferencias', requiereSesion, async (req, res) => {
   const resultado = z.object({ iaActivada: z.boolean() }).safeParse(req.body)
-  if (!resultado.success) return res.status(400).json({ error: 'Preferencia no válida' })
+  if (!resultado.success) return res.status(400).json({ error: 'Invalid preference' })
   const usuario = await prisma.usuario.update({ where: { id: req.usuarioId }, data: resultado.data, select: camposPublicos })
   res.json(usuario)
 })
@@ -158,7 +158,7 @@ router.get('/yo', requiereSesion, async (req, res) => {
   })
   if (!usuario) {
     res.clearCookie(NOMBRE_COOKIE)
-    return res.status(401).json({ error: 'La cuenta ya no existe' })
+    return res.status(401).json({ error: 'This account no longer exists' })
   }
   res.json(usuario)
 })

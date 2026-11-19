@@ -25,12 +25,12 @@ export default function ReflexionDelDia({ fecha, hayEntrada, version }: Props) {
     }
   }
 
-  const textoBoton = pidiendo ? 'Pensando…' : reflexion ? 'Generar otra reflexión' : 'Pedir una reflexión a la IA'
+  const textoBoton = pidiendo ? 'Thinking…' : reflexion ? 'Generate another reflection' : 'Ask the AI for a reflection'
 
   return (
     <section className="mt-6 rounded-2xl bg-white p-6 shadow-sm">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="font-semibold text-slate-800">Reflexión con IA</h2>
+        <h2 className="font-semibold text-slate-800">AI reflection</h2>
         {usuario?.iaActivada && hayEntrada && (
           <button
             onClick={pedirReflexion}
@@ -43,11 +43,11 @@ export default function ReflexionDelDia({ fecha, hayEntrada, version }: Props) {
       </div>
 
       {!usuario?.iaActivada ? (
-        <p className="mt-2 text-sm text-slate-500">Tienes la IA desactivada.</p>
+        <p className="mt-2 text-sm text-slate-500">You have AI turned off.</p>
       ) : !hayEntrada ? (
-        <p className="mt-2 text-sm text-slate-500">Guarda tu entrada y la IA te ayudará a sacar un aprendizaje de este día.</p>
+        <p className="mt-2 text-sm text-slate-500">Save your entry and the AI will help you take a lesson from this day.</p>
       ) : (
-        !reflexion && !error && <p className="mt-2 text-sm text-slate-500">La IA lee tu entrada y los datos del día, y te devuelve un aprendizaje y sugerencias para mañana.</p>
+        !reflexion && !error && <p className="mt-2 text-sm text-slate-500">The AI reads your entry and the day's data, and gives you back a lesson and suggestions for tomorrow.</p>
       )}
 
       {error && <p role="alert" className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>}
@@ -55,15 +55,15 @@ export default function ReflexionDelDia({ fecha, hayEntrada, version }: Props) {
       {reflexion && (
         <div className="mt-4">
           {reflexion.desactualizada && (
-            <p className="mb-2 text-xs text-amber-700">Editaste tu entrada después de esta reflexión: puedes generar otra.</p>
+            <p className="mb-2 text-xs text-amber-700">You edited your entry after this reflection: you can generate another one.</p>
           )}
           <RespuestaIA respuesta={reflexion} onCalificada={(estado) => setReflexion({ ...reflexion, estado })}>
             <p>{reflexion.respuesta.observacion}</p>
             <p className="mt-2">
-              <span className="font-medium text-noche-900">Aprendizaje: </span>
+              <span className="font-medium text-noche-900">Lesson: </span>
               {reflexion.respuesta.aprendizaje}
             </p>
-            <p className="mt-2 font-medium text-noche-900">Para mañana:</p>
+            <p className="mt-2 font-medium text-noche-900">For tomorrow:</p>
             <ul className="mt-1 list-disc space-y-1 pl-5">
               {reflexion.respuesta.sugerencias.map((s) => (
                 <li key={s}>{s}</li>
